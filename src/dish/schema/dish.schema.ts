@@ -9,8 +9,10 @@ export class Dish {
   image_detail_id: string;
   @Prop({ required: true })
   name: string;
-  @Prop({ type: [String] })
-  categories: string[];
+  @Prop({ default: 0 })
+  price: number;
+  @Prop({ required: true })
+  category: string;
   @Prop({ default: null })
   description: string;
   @Prop({ default: true })
@@ -19,6 +21,10 @@ export class Dish {
   isBestSeller: boolean;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ default: null })
+  updateAt: string;
+  @Prop()
+  options: string[];
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

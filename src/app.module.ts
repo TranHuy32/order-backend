@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { DishModule } from './dish/dish.module';
 import { CashierModule } from './cashier/cashier.module';
 import { CategoryModule } from './category/category.module';
-import { BillModule } from './bill/bill.module';
+import { CartModule } from './cart/cart.module';
 import { ImageModule } from './image/image.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -20,7 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     DishModule,
     CashierModule,
     CategoryModule,
-    BillModule,
+    CartModule,
     ImageModule,
   ],
   controllers: [],
