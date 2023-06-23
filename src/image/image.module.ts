@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ImageController } from './image.controller';
-import { ImageService } from './image.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ImageSchema, Image } from './schema/image.schema';
 import { ImageRepository } from './repository/image.repository';
+import { ImageService } from './image.service';
 
 @Module({
   imports: [
@@ -30,6 +30,6 @@ import { ImageRepository } from './repository/image.repository';
   ],
   controllers: [ImageController],
   providers: [ImageService, ImageRepository],
-  exports: [ImageService],
+  exports: [ImageService, ImageRepository],
 })
 export class ImageModule {}

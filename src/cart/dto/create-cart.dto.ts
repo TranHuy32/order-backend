@@ -5,4 +5,6 @@ export class CreateCartDto {
   note: string;
   total: number;
   createAt: string;
+  table: number;
+  
 }

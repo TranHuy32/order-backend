@@ -3,10 +3,13 @@ import { ImageRepository } from './repository/image.repository';
 import { CreateImageDto } from './dto/create-image.dto';
 import { ImageDocument, Image } from './schema/image.schema';
 import { Response } from 'express';
+import { DishRepository } from 'src/dish/repository/dish.repository';
 
 @Injectable()
 export class ImageService {
-  constructor(private readonly imageRepository: ImageRepository) {}
+  constructor(
+    private readonly imageRepository: ImageRepository,
+    private readonly dishRepository: DishRepository) { }
 
   async createImage(
     createImageDto: CreateImageDto,
@@ -22,5 +25,5 @@ export class ImageService {
   async getImage(filename: string, res: Response) {
     res.sendFile(filename, { root: './uploads' });
   }
-  
+
 }
