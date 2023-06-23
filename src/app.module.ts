@@ -6,6 +6,7 @@ import { ImageModule } from './image/image.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from './cart/cart.module';
+import { TableModule } from './table/table.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CartModule } from './cart/cart.module';
     CategoryModule,
     ImageModule,
     CartModule,
+    TableModule,
   ],
   controllers: [],
   providers: [],

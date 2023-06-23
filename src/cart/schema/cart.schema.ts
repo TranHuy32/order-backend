@@ -7,7 +7,7 @@ export type CartDocument = Cart & Document;
 export enum CartStatus {
   PENDING = 'PENDING',
   IN_PROGRESS = 'IN_PROGRESS',
-  CANCELLED = 'CANCELLED',
+  CANCEL = 'CANCEL',
   COMPLETED = 'COMPLETED',
 }
 
@@ -19,8 +19,10 @@ export class Cart {
   note: string;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ default: null })
+  updateAt: string;
   @Prop({ enum: Object.values(CartStatus), default: CartStatus.PENDING })
-  status: string;
+  status: CartStatus;
   @Prop({ required: true })
   total: number;
   @Prop({ default: null })

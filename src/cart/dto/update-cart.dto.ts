@@ -1,9 +1,9 @@
 import { CreateDishOrderDto } from './create-dish-order.dto';
 
-export class CreateCartDto {
+export class UpdateCartDto {
   order: CreateDishOrderDto[];
   note: string;
   total: number;
   table: number;
-  createAt: string;
+  updateAt: string;
 }  
