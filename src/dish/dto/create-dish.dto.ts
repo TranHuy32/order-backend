@@ -4,6 +4,7 @@ export class CreateDishDto {
   image_detail: CreateImageDetailDto;
   name: string;
   description: string;
-  categories: string[];
+  category: string;
+  price: number;
   createAt: string;
 }
