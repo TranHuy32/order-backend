@@ -147,8 +147,8 @@ export class DishService {
       await dish.save();
       return dish;
     }
-  }
-  
+  }  
+
   async isBestSeller(_id: string, isBestSeller: boolean): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
@@ -252,3 +252,4 @@ export class DishService {
     }
   }
 }
+

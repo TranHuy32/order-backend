@@ -1,14 +1,15 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { Dish, DishSchema } from './schema/dish.schema';
-import { ImageModule } from 'src/image/image.module';
-import { CategoryModule } from 'src/category/category.module';
-import { DishController } from './dish.controller';
-import { DishService } from './dish.service';
-import { DishRepository } from './repository/dish.repository';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { MulterModule } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
+import { Dish, DishSchema } from "./schema/dish.schema";
+import { ImageModule } from "src/image/image.module";
+import { CategoryModule } from "src/category/category.module";
+import { DishController } from "./dish.controller";
+import { DishService } from "./dish.service";
+import { DishRepository } from "./repository/dish.repository";
+
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { DishRepository } from './repository/dish.repository';
   ],
   controllers: [DishController],
   providers: [DishService, DishRepository],
-  exports: [DishService],
+  exports: [DishService, DishRepository],
 })
-export class DishModule {}
+export class DishModule { }

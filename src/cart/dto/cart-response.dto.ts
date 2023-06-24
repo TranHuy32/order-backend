@@ -9,6 +9,7 @@ export class CartResponse {
     status: string;
     cashier_id: string;
     table: string;
+
     constructor(cart: any) {
         this._id = cart._id;
         this.order = cart.order;
@@ -20,3 +21,4 @@ export class CartResponse {
         this.table = cart.table;
     }
 }
+

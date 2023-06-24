@@ -7,12 +7,14 @@ import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
 
+
 @Injectable()
 export class CartService {
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly tableService: TableService,
   ) {}
+
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
@@ -40,6 +42,7 @@ export class CartService {
     if (existingTable.isActive === false) {
       throw new Error('This table is not actived');
     }
+
     newCart.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -62,6 +65,7 @@ export class CartService {
     let filteredCarts = [];
     for (const allCart of allCarts) {
       if (allCart.status === 'IN_PROGRESS' || allCart.status === 'PENDING') {
+
         filteredCarts.push(allCart);
       }
     }
@@ -115,4 +119,5 @@ export class CartService {
     await cart.save();
     return cart;
   }
+
 }

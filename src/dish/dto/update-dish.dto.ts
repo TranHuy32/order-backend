@@ -7,3 +7,4 @@ export class UpdateDishDto {
   description: string;
   category: string;
 }
+
