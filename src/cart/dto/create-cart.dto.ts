@@ -4,6 +4,6 @@ export class CreateCartDto {
   order: CreateDishOrderDto[];
   note: string;
   total: number;
-  table: number;
+  table: string;
   createAt: string;
 }  

@@ -8,7 +8,7 @@ export class CartResponse {
     createAt: string;
     status: string;
     cashier_id: string;
-    table: number;
+    table: string;
     constructor(cart: any) {
         this._id = cart._id;
         this.order = cart.order;
