@@ -38,7 +38,7 @@ export class DishController {
 
   // Dish detail
   @Get('/:id')
-  async findComicById(@Param('id') id: string): Promise<DishResponse> {
+  async findDishById(@Param('id') id: string): Promise<DishResponse> {
     return this.dishService.findDishById(id);
   }
 
@@ -123,3 +123,4 @@ export class DishController {
     return this.dishService.deleteOption(id, option);
   }
 }
+
