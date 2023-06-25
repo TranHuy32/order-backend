@@ -221,21 +221,22 @@ export class DishService {
   async addOption(_id: string, options: string[]): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
-      return 'the dish has not been created yet';
+      return 'The dish has not been created yet';
     } else {
-      if (dish.options instanceof Blob) {
-        dish.options = options;
-      } else {
+      if (Array.isArray(dish.options)) {
         for (const option of options) {
           if (!dish.options.includes(option)) {
             dish.options.push(option);
           }
         }
+      } else {
+        dish.options = options;
       }
       await dish.save();
       return dish;
     }
   }
+  
 
   async deleteOption(_id: string, options: string[]): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
