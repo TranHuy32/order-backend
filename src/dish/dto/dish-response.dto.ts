@@ -22,7 +22,7 @@ export class DishResponse {
     this.createAt = dish.createAt;
     this.updateAt = dish.updateAt;
     this.isActive = dish.isActive;
-    this.isBestSeller = dishPath.isBestSeller;
-    this.options = dishPath.options;
+    this.isBestSeller = dish.isBestSeller;
+    this.options = dish.options;
   }
 }
