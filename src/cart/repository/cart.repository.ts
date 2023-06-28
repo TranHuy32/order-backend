@@ -12,3 +12,4 @@ export class CartRepository extends EntityRepository<CartDocument> {
     super(cartModel, imageService);
   }
 }
+

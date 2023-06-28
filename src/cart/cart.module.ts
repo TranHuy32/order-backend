@@ -8,15 +8,18 @@ import { CartService } from "./cart.service";
 import { DishModule } from "src/dish/dish.module";
 import { TableModule } from "src/table/table.module";
 
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
     ImageModule,
     DishModule,
     TableModule
+
   ],
   controllers: [CartController],
   providers: [CartService, CartRepository],
   exports: [CartService, CartRepository],
 })
 export class CartModule {}
+

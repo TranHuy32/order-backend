@@ -8,3 +8,4 @@ export class UpdateDishDto {
   category: string;
   amount: number
 }
+

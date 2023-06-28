@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from './cart/cart.module';
 import { TableModule } from './table/table.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
@@ -19,8 +20,8 @@ import { TableModule } from './table/table.module';
       inject: [ConfigService],
     }),
     DishModule,
-    CashierModule,
     CategoryModule,
+
     ImageModule,
     CartModule,
     TableModule,
