@@ -12,7 +12,7 @@ import { Category, CategorySchema } from './schema/category.schema';
     ]),
   ],
   providers: [CategoryService, CategoryRepository],
-  exports: [CategoryService],
+  exports: [CategoryService, CategoryRepository],
   controllers: [CategoryController],
 })
 export class CategoryModule {}

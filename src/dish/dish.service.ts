@@ -148,7 +148,11 @@ export class DishService {
       await dish.save();
       return dish;
     }
+<<<<<<< HEAD
   }
+=======
+  }  
+>>>>>>> edf529cbade5cc6c559cf37efe478cf4fa52691e
 
   async isBestSeller(_id: string, isBestSeller: boolean): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
@@ -256,3 +260,7 @@ export class DishService {
     }
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> edf529cbade5cc6c559cf37efe478cf4fa52691e

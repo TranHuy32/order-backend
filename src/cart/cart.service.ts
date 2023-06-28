@@ -7,6 +7,7 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
 import { DishRepository } from 'src/dish/repository/dish.repository';
 
+
 @Injectable()
 export class CartService {
   constructor(
@@ -14,6 +15,7 @@ export class CartService {
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
   ) {}
+
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
@@ -67,7 +69,6 @@ export class CartService {
       dish.amount -= dishOrder.number;
       await dish.save();
     }
-
     newCart.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -90,6 +91,7 @@ export class CartService {
     let filteredCarts = [];
     for (const allCart of allCarts) {
       if (allCart.status === 'IN_PROGRESS' || allCart.status === 'PENDING') {
+
         filteredCarts.push(allCart);
       }
     }
@@ -143,4 +145,5 @@ export class CartService {
     await cart.save();
     return cart;
   }
+
 }
