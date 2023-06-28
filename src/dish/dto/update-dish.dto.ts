@@ -6,4 +6,5 @@ export class UpdateDishDto {
   price: number;
   description: string;
   category: string;
+  amount: number
 }

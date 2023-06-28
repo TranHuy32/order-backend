@@ -7,4 +7,5 @@ export class CreateDishDto {
   category: string;
   price: number;
   createAt: string;
+  amount: number
 }
