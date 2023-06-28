@@ -12,6 +12,7 @@ export class DishResponse {
   isActive: boolean;
   isBestSeller: boolean;
   options: string[]
+  amount: number
   constructor(dish: any, dishPath: any) {
     this._id = dish._id;
     this.name = dish.name;
@@ -24,5 +25,6 @@ export class DishResponse {
     this.isActive = dish.isActive;
     this.isBestSeller = dish.isBestSeller;
     this.options = dish.options;
+    this.amount = dish.amount;
   }
 }
