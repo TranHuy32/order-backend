@@ -15,6 +15,8 @@ export class Dish {
   category: string;
   @Prop({ default: null })
   description: string;
+  @Prop({ default: 0 })
+  amount: number;
   @Prop({ default: true })
   isActive: boolean;
   @Prop({ default: false })

@@ -7,4 +7,7 @@ export class CreateDishDto {
   description: string;
   category: string;
   price: number;
+  createAt: string;
+  amount: number
+}
 

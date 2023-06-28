@@ -10,7 +10,9 @@ export class DishResponse {
   createAt: string;
   updateAt: string;
   isActive: boolean;
-  // isBestSeller: boolean;
+  isBestSeller: boolean;
+  options: string[]
+  amount: number
   constructor(dish: any, dishPath: any) {
     this._id = dish._id;
     this.name = dish.name;
@@ -21,6 +23,8 @@ export class DishResponse {
     this.createAt = dish.createAt;
     this.updateAt = dish.updateAt;
     this.isActive = dish.isActive;
-    // this.isBestSeller = dishPath.isBestSeller;
+    this.isBestSeller = dish.isBestSeller;
+    this.options = dish.options;
+    this.amount = dish.amount;
   }
 }
