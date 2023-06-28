@@ -34,6 +34,6 @@ import { DishRepository } from './repository/dish.repository';
   ],
   controllers: [DishController],
   providers: [DishService, DishRepository],
-  exports: [DishService],
+  exports: [DishService, DishRepository],
 })
 export class DishModule {}

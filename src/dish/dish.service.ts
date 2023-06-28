@@ -35,6 +35,7 @@ export class DishService {
       ...imagePath,
       createAt: dish.createAt,
       description: dish.description,
+      amount: dish.amount
     };
   }
 
@@ -148,7 +149,7 @@ export class DishService {
       return dish;
     }
   }
-  
+
   async isBestSeller(_id: string, isBestSeller: boolean): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
@@ -210,6 +211,9 @@ export class DishService {
     }
     if (updateDishDto.name) {
       dish.name = updateDishDto.name;
+    }
+    if (updateDishDto.amount) {
+      dish.amount = updateDishDto.amount;
     }
     dish.updateAt = new Date().toLocaleString('en-GB', {
       hour12: false,
