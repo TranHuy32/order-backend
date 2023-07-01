@@ -35,6 +35,7 @@ export class DishService {
       ...imagePath,
       createAt: dish.createAt,
       description: dish.description,
+      price: dish.price,
       amount: dish.amount
     };
   }
