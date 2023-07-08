@@ -35,6 +35,7 @@ export class DishService {
       ...imagePath,
       createAt: dish.createAt,
       description: dish.description,
+      price: dish.price,
       amount: dish.amount
     };
   }
@@ -98,6 +99,23 @@ export class DishService {
     }
     return responeAllDishes;
   }
+
+  async findAllDishesHidden(limit?: number): Promise<any> {
+    const allDishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
+    let responeAllDishes = <any>[];
+    const filterAllDishes = allDishes.filter(
+      (allDishes) => allDishes.isActive === false,
+    );
+    const limitedDishes = limit
+      ? filterAllDishes.slice(0, limit)
+      : filterAllDishes;
+    for (const allDish of limitedDishes) {
+      const responeAllDish = await this.getDishOption(allDish, true);
+      responeAllDishes.push(responeAllDish);
+    }
+    return responeAllDishes;
+  }
+
   async findBestSeller(limit?: number): Promise<any> {
     const allDishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
     let responeAllDishes = <any>[];
