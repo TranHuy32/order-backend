@@ -21,9 +21,9 @@ export class CallStaffService {
     if (!existingTable) {
       throw new Error('The table does not exist');
     }
-    if (!existingTable.isActive) {
-      throw new Error('This table is not active');
-    }
+    // if (!existingTable.isActive) {
+    //   throw new Error('This table is not active');
+    // }
     newCallStaff.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -39,6 +39,7 @@ export class CallStaffService {
       return {
         _id: callStaff._id,
         table: callStaff.table,
+        createdAt: callStaff.createAt
       };
     });
   }
