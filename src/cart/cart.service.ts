@@ -13,15 +13,28 @@ export class CartService {
     private readonly cartRepository: CartRepository,
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
-  ) {}
+  ) { }
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
       return new CartResponse(cart);
     }
+    const orderItems = [];
+    for (const orderItem of cart.order) {
+      const dish = await this.dishRepository.findOneObject({ _id: orderItem.dish_id });
+      if (dish) {
+        orderItems.push({
+          ...orderItem,
+          dish_name: dish.name,
+          dish_price: dish.price,
+          // Thêm các thông tin món ăn khác mà bạn muốn trả về
+        });
+      }
+    }
+
     return {
       _id: cart._id,
-      order: cart.order,
+      order: orderItems,
       note: cart.note,
       total: cart.total,
       // status: cart.status,

@@ -24,7 +24,7 @@ export class DishController {
   constructor(
     private readonly dishService: DishService,
     private readonly categoryService: CategoryService,
-  ) {}
+  ) { }
   // Tạo dish
   @Post('create')
   @UseInterceptors(FileInterceptor('image_detail'))
@@ -52,6 +52,12 @@ export class DishController {
   @Get('menu/all-actived')
   async findAllDishActived(@Query() query): Promise<Dish[]> {
     return this.dishService.findAllDishesActived(query.limit);
+  }
+
+  // All dishes actived
+  @Get('menu/all-hidden')
+  async findAllDishHidden(@Query() query): Promise<Dish[]> {
+    return this.dishService.findAllDishesHidden(query.limit);
   }
 
   // All dishes best-seller
