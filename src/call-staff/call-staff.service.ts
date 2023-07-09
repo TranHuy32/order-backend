@@ -3,6 +3,7 @@ import { CallStaffRepository } from './repository/call-staff.repository';
 import { CreateCallStaffDto } from './dto/create-call-staff.dto';
 import { CallStaffDocument } from './schema/call-staff.schema';
 import { TableService } from 'src/table/table.service';
+import * as moment from 'moment';
 
 @Injectable()
 export class CallStaffService {
@@ -30,18 +31,40 @@ export class CallStaffService {
     return await this.callStaffRepository.createObject(newCallStaff);
   }
 
-  async findAllCallStaff(): Promise<any> {
+  async findAllCallStaff(time?: number): Promise<any> {
     const callStaffs = await this.callStaffRepository.findObjectWithoutLimit();
     if (callStaffs === null || callStaffs.length === 0) {
       return 'No call staff created';
     }
-    return callStaffs.map((callStaff) => {
-      return {
-        _id: callStaff._id,
-        table: callStaff.table,
-        createdAt: callStaff.createAt
-      };
-    });
+
+    if (time !== undefined) {
+      const currentTime = moment(); // Lấy thời gian hiện tại
+      const filteredCallStaffs = callStaffs.filter((callStaff) => {
+        const createdAt = moment(callStaff.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+        const timeDifference = moment
+          .duration(currentTime.diff(createdAt))
+          .asMinutes(); // Tính khoảng thời gian trong phút
+
+        return timeDifference <= time; // Lọc ra những yêu cầu trong vòng `time` phút
+      });
+      const reversedCallStaffs = filteredCallStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
+      return reversedCallStaffs.map((callStaff) => {
+        return {
+          _id: callStaff._id,
+          table: callStaff.table,
+          createdAt: callStaff.createAt,
+        };
+      });
+    } else {
+      const reversedCallStaffs = callStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
+      return reversedCallStaffs.map((callStaff) => {
+        return {
+          _id: callStaff._id,
+          table: callStaff.table,
+          createdAt: callStaff.createAt,
+        };
+      });
+    }
   }
 
   async deleteCallStaff(id: string): Promise<any> {
