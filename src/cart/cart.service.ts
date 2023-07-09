@@ -6,6 +6,7 @@ import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
 import { DishRepository } from 'src/dish/repository/dish.repository';
+import * as moment from 'moment';
 
 @Injectable()
 export class CartService {
@@ -13,7 +14,7 @@ export class CartService {
     private readonly cartRepository: CartRepository,
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
-  ) { }
+  ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
@@ -21,7 +22,9 @@ export class CartService {
     }
     const orderItems = [];
     for (const orderItem of cart.order) {
-      const dish = await this.dishRepository.findOneObject({ _id: orderItem.dish_id });
+      const dish = await this.dishRepository.findOneObject({
+        _id: orderItem.dish_id,
+      });
       if (dish) {
         orderItems.push({
           ...orderItem,
@@ -87,16 +90,39 @@ export class CartService {
     return await this.cartRepository.createObject(newCart);
   }
 
-  async findAllCarts(limit?: number): Promise<any> {
-    const allCarts = await this.cartRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    let responeAllCarts = <any>[];
-    const limitedCarts = limit ? allCarts.slice(0, limit) : allCarts;
-    for (const allCart of limitedCarts) {
-      const responeAllCart = await this.getCartOption(allCart, false);
-      responeAllCarts.push(responeAllCart);
+  async findAllCarts(time?: number): Promise<any> {
+    const allCarts = await this.cartRepository.findObjectWithoutLimit();
+    if (allCarts === null || allCarts.length === 0) {
+      return 'No carts created';
     }
-    return responeAllCarts;
+    if (time !== undefined) {
+      const currentTime = moment(); // Lấy thời gian hiện tại
+      const filteredCarts = allCarts.filter((cart) => {
+        const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+        const timeDifference = moment
+          .duration(currentTime.diff(createdAt))
+          .asMinutes(); // Tính khoảng thời gian trong phút
+
+        return timeDifference <= time; // Lọc ra những yêu cầu trong vòng `time` phút
+      });
+      let responseAllCarts = [];
+      for (const cart of filteredCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    } else {
+      let responseAllCarts = [];
+      for (const cart of allCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    }
   }
+
   // async findAllCartsBackLog(limit?: number): Promise<any> {
   //   const allCarts = await this.cartRepository.findObjectWithoutLimit();
   //   let responeAllcartes = <any>[];

@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CallStaffService } from './call-staff.service';
 import { CreateCallStaffDto } from './dto/create-call-staff.dto';
 import { CallStaffDocument } from './schema/call-staff.schema';
@@ -17,8 +25,8 @@ export class CallStaffController {
 
   // all call staff
   @Get('/all')
-  async allCallStaff() {
-    return this.callStaffService.findAllCallStaff();
+  async allCallStaff(@Query() query: any) {
+    return this.callStaffService.findAllCallStaff(query.time);
   }
   @Delete('delete/:id')
   async deleteCallStaff(@Param('id') id: string) {
