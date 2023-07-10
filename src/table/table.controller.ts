@@ -1,17 +1,29 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 
 @Controller('table')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
 
+  // @UseGuards(CashierAuthGuard)
   @Post('/create')
   async createTable(@Body() createTableDto: CreateTableDto) {
     return this.tableService.createTable(createTableDto);
   }
 
+  // @UseGuards(CashierAuthGuard)
   @Put('/update/:id')
   async updateTable(
     @Param('id') id: string,
@@ -30,11 +42,13 @@ export class TableController {
     return this.tableService.findTableByName(name);
   }
 
+  // @UseGuards(CashierAuthGuard)
   @Delete('delete/:name')
   async deleteTable(@Param('name') name: string) {
     return this.tableService.deleteTable(name);
   }
 
+  // @UseGuards(CashierAuthGuard)
   @Put('/active/:name')
   async activeTable(
     @Param('name') name: string,

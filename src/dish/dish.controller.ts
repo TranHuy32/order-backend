@@ -10,6 +10,7 @@ import {
   Query,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { DishService } from './dish.service';
 import { CategoryService } from 'src/category/category.service';
@@ -18,14 +19,16 @@ import { CreateDishDto } from './dto/create-dish.dto';
 import { Dish, DishDocument } from './schema/dish.schema';
 import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
+import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 
 @Controller('dish')
 export class DishController {
   constructor(
     private readonly dishService: DishService,
     private readonly categoryService: CategoryService,
-  ) { }
+  ) {}
   // Tạo dish
+  // @UseGuards(CashierAuthGuard)
   @Post('create')
   @UseInterceptors(FileInterceptor('image_detail'))
   async createDish(
@@ -76,6 +79,7 @@ export class DishController {
   }
 
   // Active dish
+  // @UseGuards(CashierAuthGuard)
   @Put('/active/:id')
   async activeDish(
     @Param('id') id: string,
@@ -85,6 +89,7 @@ export class DishController {
   }
 
   // Set best seller dish
+  // @UseGuards(CashierAuthGuard)
   @Put('/best-seller/:id')
   async bestSeller(
     @Param('id') id: string,
@@ -94,12 +99,14 @@ export class DishController {
   }
 
   // Delete dish
+  // @UseGuards(CashierAuthGuard)
   @Delete('/delete/:id')
   async deleteDish(@Param('id') id: string): Promise<any> {
     return this.dishService.deleteDish(id);
   }
 
   // Update dish
+  // @UseGuards(CashierAuthGuard)
   @Put('update/:id')
   @UseInterceptors(FileInterceptor('image_detail'))
   async updateDish(
@@ -112,6 +119,7 @@ export class DishController {
   }
 
   // Add option
+  // @UseGuards(CashierAuthGuard)
   @Post('add-option/:id')
   async addOption(
     @Param('id') id: string,
@@ -121,6 +129,7 @@ export class DishController {
   }
 
   // Delete option
+  // @UseGuards(CashierAuthGuard)
   @Delete('delete-option/:id')
   async deleteOption(
     @Param('id') id: string,

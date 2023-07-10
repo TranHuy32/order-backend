@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
+import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 
 @Controller('category')
 export class CategoryController {
@@ -10,6 +11,8 @@ export class CategoryController {
   async allCategory() {
     return this.categoryService.findAllCatrgories();
   }
+  
+  // @UseGuards(CashierAuthGuard)
   @Delete('delete/:id')
   async deleteCategory(@Param('id') id: string) {
     return this.categoryService.deleteCategory(id);
