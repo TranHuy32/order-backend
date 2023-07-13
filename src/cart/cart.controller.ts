@@ -26,7 +26,7 @@ export class CartController {
   // All carts
   @Get('menu/all')
   async findAllCarts(@Query() query): Promise<Cart[]> {
-    return this.cartService.findAllCarts(query.time);
+    return this.cartService.findAllCarts(query);
   }
 
   // All carts backlog

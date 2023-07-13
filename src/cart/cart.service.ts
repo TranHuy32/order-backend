@@ -90,12 +90,26 @@ export class CartService {
     return await this.cartRepository.createObject(newCart);
   }
 
-  async findAllCarts(time?: number): Promise<any> {
+  async findObjectsByDate(date: string): Promise<CartDocument[] | null> {
+    const startOfDay = moment(date, 'DD/MM/YYYY')
+      .startOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const endOfDay = moment(date, 'DD/MM/YYYY')
+      .endOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const result = await this.cartRepository.findObjectsBy('createAt', {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    });
+    return result;
+  }
+
+  async findAllCarts(q?: any): Promise<any> {
     const allCarts = await this.cartRepository.findObjectWithoutLimit();
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
     }
-    if (time !== undefined) {
+    if (q.time !== undefined) {
       const currentTime = moment(); // Lấy thời gian hiện tại
       const filteredCarts = allCarts.filter((cart) => {
         const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
@@ -103,10 +117,22 @@ export class CartService {
           .duration(currentTime.diff(createdAt))
           .asMinutes(); // Tính khoảng thời gian trong phút
 
-        return timeDifference <= time; // Lọc ra những yêu cầu trong vòng `time` phút
+        return timeDifference <= q.time; // Lọc ra những yêu cầu trong vòng `time` phút
       });
       let responseAllCarts = [];
       for (const cart of filteredCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    } else if (q.date !== undefined) {
+      const cartsByDate = await this.findObjectsByDate(q.date);
+      // if (cartsByDate === null || cartsByDate.length === 0) {
+      //   return 'No carts created on the specified date';
+      // }
+      let responseAllCarts = [];
+      for (const cart of cartsByDate) {
         const responseAllCart = await this.getCartOption(cart, false);
         responseAllCarts.push(responseAllCart);
       }
