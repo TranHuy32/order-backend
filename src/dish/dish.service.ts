@@ -164,8 +164,7 @@ export class DishService {
       }
       dish.isActive = isActive;
       await dish.save();
-      return await this.getDishOption(dish, true);
-      // return dish;
+      return dish;
     }
   }
 
@@ -238,7 +237,8 @@ export class DishService {
       hour12: false,
     });
     await dish.save();
-    return dish;
+    return await this.getDishOption(dish, true);
+    // return dish;
   }
 
   async addOption(_id: string, options: string[]): Promise<any> {
