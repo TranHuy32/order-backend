@@ -36,7 +36,7 @@ export class DishService {
       createAt: dish.createAt,
       description: dish.description,
       price: dish.price,
-      amount: dish.amount
+      amount: dish.amount,
     };
   }
 
@@ -164,7 +164,8 @@ export class DishService {
       }
       dish.isActive = isActive;
       await dish.save();
-      return dish;
+      return await this.getDishOption(dish, true);
+      // return dish;
     }
   }
 
