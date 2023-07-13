@@ -238,7 +238,8 @@ export class DishService {
       hour12: false,
     });
     await dish.save();
-    return dish;
+    // return dish;
+    return await this.getDishOption(dish, true);
   }
 
   async addOption(_id: string, options: string[]): Promise<any> {
