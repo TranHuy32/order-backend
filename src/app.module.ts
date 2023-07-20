@@ -9,6 +9,7 @@ import { CartModule } from './cart/cart.module';
 import { TableModule } from './table/table.module';
 import { CallStaffModule } from './call-staff/call-staff.module';
 import { CashierAuthModule } from './auth/cashier-auth/cashier.auth.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { CashierAuthModule } from './auth/cashier-auth/cashier.auth.module';
     CartModule,
     TableModule,
     CallStaffModule,
-    CashierAuthModule
+    CashierAuthModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [],

@@ -9,6 +9,7 @@ import { CategoryModule } from 'src/category/category.module';
 import { DishController } from './dish.controller';
 import { DishService } from './dish.service';
 import { DishRepository } from './repository/dish.repository';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DishRepository } from './repository/dish.repository';
     MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }]),
     ImageModule,
     CategoryModule,
+    EventsModule,
   ],
   controllers: [DishController],
   providers: [DishService, DishRepository],

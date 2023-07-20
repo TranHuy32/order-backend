@@ -4,12 +4,14 @@ import { CreateCallStaffDto } from './dto/create-call-staff.dto';
 import { CallStaffDocument } from './schema/call-staff.schema';
 import { TableService } from 'src/table/table.service';
 import * as moment from 'moment';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class CallStaffService {
   constructor(
     private readonly callStaffRepository: CallStaffRepository,
     private readonly tableService: TableService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async createCallStaff(
@@ -28,7 +30,17 @@ export class CallStaffService {
     newCallStaff.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
-    return await this.callStaffRepository.createObject(newCallStaff);
+    const callStaffCreated = await this.callStaffRepository.createObject(
+      newCallStaff,
+    );
+    const dataSocket = {
+      _id: callStaffCreated._id,
+      table: callStaffCreated.table,
+      createdAt: callStaffCreated.createAt,
+    };
+    this.eventsGateway.createCallStaff(dataSocket);
+
+    return callStaffCreated;
   }
 
   async findAllCallStaff(time?: number): Promise<any> {

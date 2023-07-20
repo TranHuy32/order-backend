@@ -9,13 +9,15 @@ import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { ImageResponse } from 'src/image/dto/image-response.dto';
 import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
-
+import { Socket } from 'socket.io';
+import { EventsGateway } from 'src/events/events.gateway';
 @Injectable()
 export class DishService {
   constructor(
     private readonly dishRepository: DishRepository,
     private readonly imageService: ImageService,
     private readonly categoryService: CategoryService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async getDishOption(dish: DishDocument, isDetail: boolean): Promise<any> {
@@ -66,7 +68,11 @@ export class DishService {
     newDish.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
-    return await this.dishRepository.createObject(newDish);
+
+    const newDishCreated = await this.dishRepository.createObject(newDish);
+    const newDishSocket = await this.getDishOption(newDishCreated, true);
+    this.eventsGateway.createDish(newDishSocket);
+    return newDishCreated;
   }
 
   async findDishById(_id: string): Promise<any> {

@@ -7,6 +7,7 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
 import { DishRepository } from 'src/dish/repository/dish.repository';
 import * as moment from 'moment';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class CartService {
@@ -14,6 +15,7 @@ export class CartService {
     private readonly cartRepository: CartRepository,
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
@@ -87,7 +89,10 @@ export class CartService {
     newCart.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
-    return await this.cartRepository.createObject(newCart);
+    const newCartCreated = await this.cartRepository.createObject(newCart);
+    const dataSocket = await this.getCartOption(newCartCreated, false);
+    this.eventsGateway.createCart(dataSocket);
+    return newCartCreated;
   }
 
   async findObjectsByDate(date: string): Promise<CartDocument[] | null> {
