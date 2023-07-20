@@ -4,10 +4,12 @@ import { TableService } from './table.service';
 import { TableRepository } from './repository/table.repository';
 import { Table, TableSchema } from './schema/table.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Table.name, schema: TableSchema }]),
+    EventsModule,
   ],
   controllers: [TableController],
   exports: [TableService],

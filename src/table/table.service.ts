@@ -3,10 +3,14 @@ import { CreateTableDto } from './dto/create-table.dto';
 import { TableDocument } from './schema/table.schema';
 import { TableRepository } from './repository/table.repository';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class TableService {
-  constructor(private readonly tableRepository: TableRepository) {}
+  constructor(
+    private readonly tableRepository: TableRepository,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   async createTable(createTableDto: CreateTableDto): Promise<TableDocument> {
     const name = createTableDto.name;
@@ -54,13 +58,14 @@ export class TableService {
     return 'Invalid table';
   }
 
-  async activeTable(name: string, isActive: boolean): Promise<TableDocument> {    
-    const table = await this.tableRepository.findOneObject({ name });    
+  async activeTable(name: string, isActive: boolean): Promise<TableDocument> {
+    const table = await this.tableRepository.findOneObject({ name });
     if (!table) {
       throw new Error('The table does not existed');
-    }    
+    }
     table.isActive = isActive;
     table.save();
+    this.eventsGateway.activeTable(table);
     return table;
   }
 

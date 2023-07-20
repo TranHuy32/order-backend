@@ -75,4 +75,10 @@ export class EventsGateway {
     this.server.emit('newCart', data);
     return data;
   }
+
+  @SubscribeMessage('activeTable')
+  async activeTable(@MessageBody() data: any): Promise<any> {
+    this.server.emit('activeTable', data);
+    return data;
+  }
 }
