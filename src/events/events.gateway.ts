@@ -23,7 +23,7 @@ export class EventsGateway {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-    this.server.emit('connected', socket);
+      socket.emit('connected', 'Hello from server!');
       console.log(socket.id);
       console.log('Connected');
     });
