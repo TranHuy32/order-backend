@@ -16,9 +16,9 @@ export class TableService {
   public async hashToken(table_name: string): Promise<string> {
     const salt = await bcrypt.genSalt(12);
     const hash = await bcrypt.hash(table_name, salt);
-  
+
     const hashWithoutSlash = hash.replace(/\//g, '');
-  
+
     return hashWithoutSlash;
   }
 
@@ -46,6 +46,7 @@ export class TableService {
         _id: table._id,
         name: table.name,
         isActive: table.isActive,
+        token: table.token,
       };
     });
   }
