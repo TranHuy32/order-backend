@@ -31,9 +31,11 @@ export class CartController {
 
   // History cart
   @Get('history/all')
-  async findCartByCustomer(@Query() query, @Body() body): Promise<Cart[]> {
+  async findCartByCustomer(
+    @Query() query,
+    @Body('body') body,
+  ): Promise<Cart[]> {
     console.log(body);
-    
     return this.cartService.findHistoryCarts(query, body);
   }
   // All carts backlog
