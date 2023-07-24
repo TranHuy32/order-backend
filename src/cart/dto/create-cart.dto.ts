@@ -6,4 +6,5 @@ export class CreateCartDto {
   total: number;
   table: string;
   createAt: string;
+  customer_name: string
 }  

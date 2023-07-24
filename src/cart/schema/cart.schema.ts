@@ -29,6 +29,8 @@ export class Cart {
   cashier_id: string;
   @Prop({ required: true })
   table: string;
+  @Prop({ default: null })
+  customer_name: string;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

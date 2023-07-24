@@ -36,7 +36,6 @@ export class CartService {
         });
       }
     }
-
     return {
       _id: cart._id,
       order: orderItems,
@@ -45,6 +44,7 @@ export class CartService {
       // status: cart.status,
       table: cart.table,
       createAt: cart.createAt,
+      customer_name: cart.customer_name,
     };
   }
 
@@ -146,6 +146,50 @@ export class CartService {
     } else {
       let responseAllCarts = [];
       for (const cart of allCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    }
+  }
+
+  async findHistoryCarts(q?: any, body?: any): Promise<any> {
+    const allCarts = await this.cartRepository.findObjectWithoutLimit();
+    if (allCarts === null || allCarts.length === 0) {
+      return 'No carts created';
+    }
+    let historyCarts = allCarts;
+    if (body.table && body.customer_name) {
+      historyCarts = allCarts.filter(
+        (cart) =>
+          cart.table === body.table &&
+          cart.customer_name === body.customer_name,
+      );
+      if (historyCarts.length === 0) {
+        return 'No matching carts found';
+      }
+    }
+
+    if (q.time !== undefined) {
+      const currentTime = moment(); // Lấy thời gian hiện tại
+      const filteredCarts = historyCarts.filter((cart) => {
+        const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+        const timeDifference = moment
+          .duration(currentTime.diff(createdAt))
+          .asMinutes(); // Tính khoảng thời gian trong phút
+        return timeDifference <= q.time; // Lọc ra những yêu cầu trong vòng `time` phút
+      });
+      let responseAllCarts = [];
+      for (const cart of filteredCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    } else {
+      let responseAllCarts = [];
+      for (const cart of historyCarts) {
         const responseAllCart = await this.getCartOption(cart, false);
         responseAllCarts.push(responseAllCart);
       }
