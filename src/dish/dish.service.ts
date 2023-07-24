@@ -9,7 +9,6 @@ import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { ImageResponse } from 'src/image/dto/image-response.dto';
 import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
-import { Socket } from 'socket.io';
 import { EventsGateway } from 'src/events/events.gateway';
 @Injectable()
 export class DishService {

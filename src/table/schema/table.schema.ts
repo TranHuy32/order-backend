@@ -9,6 +9,8 @@ export class Table {
   name: string;
   @Prop({ default: true })
   isActive: boolean;
+  @Prop({ default: null })
+  token: string;
   @Prop({ required: true })
   createAt: string;
   @Prop({ default: null })

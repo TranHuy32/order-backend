@@ -4,6 +4,7 @@ import { TableDocument } from './schema/table.schema';
 import { TableRepository } from './repository/table.repository';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { EventsGateway } from 'src/events/events.gateway';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class TableService {
@@ -12,6 +13,10 @@ export class TableService {
     private readonly eventsGateway: EventsGateway,
   ) {}
 
+  public async hashToken(table_name: string): Promise<string> {
+    return await bcrypt.hash(table_name, 12);
+  }
+
   async createTable(createTableDto: CreateTableDto): Promise<TableDocument> {
     const name = createTableDto.name;
     const existingTable = await this.tableRepository.findOneObject({ name });
@@ -19,6 +24,7 @@ export class TableService {
       throw new Error('This table already exists');
     }
     const newTable = Object.assign(createTableDto);
+    newTable.token = await this.hashToken(name);
     newTable.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -41,6 +47,14 @@ export class TableService {
 
   async findTableByName(name: string): Promise<TableDocument> {
     const existingTable = await this.tableRepository.findOneObject({ name });
+    if (!existingTable) {
+      throw new Error('The table does not existed');
+    }
+    return existingTable;
+  }
+
+  async findTableByToken(token: string): Promise<TableDocument> {
+    const existingTable = await this.tableRepository.findOneObject({ token });
     if (!existingTable) {
       throw new Error('The table does not existed');
     }

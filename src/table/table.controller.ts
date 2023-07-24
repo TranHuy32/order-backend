@@ -42,6 +42,10 @@ export class TableController {
     return this.tableService.findTableByName(name);
   }
 
+  @Get('/token')
+  async detaiTokenTable(@Body('token') token: string) {
+    return this.tableService.findTableByToken(token);
+  }
   // @UseGuards(CashierAuthGuard)
   @Delete('delete/:name')
   async deleteTable(@Param('name') name: string) {
