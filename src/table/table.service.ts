@@ -44,6 +44,7 @@ export class TableService {
         _id: table._id,
         name: table.name,
         isActive: table.isActive,
+        token: table.token,
       };
     });
   }

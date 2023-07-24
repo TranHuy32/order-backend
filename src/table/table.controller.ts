@@ -42,8 +42,8 @@ export class TableController {
     return this.tableService.findTableByName(name);
   }
 
-  @Get('/token')
-  async detaiTokenTable(@Body('token') token: string) {
+  @Get('/token/:token')
+  async detaiTokenTable(@Param('token') token: string) {
     return this.tableService.findTableByToken(token);
   }
   
