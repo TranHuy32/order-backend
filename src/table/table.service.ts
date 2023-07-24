@@ -14,7 +14,10 @@ export class TableService {
   ) {}
 
   public async hashToken(table_name: string): Promise<string> {
-    return await bcrypt.hash(table_name, 12);
+    const salt = await bcrypt.genSalt(12);
+    const hash = await bcrypt.hash(table_name, salt);
+    const hashWithoutSlash = hash.replace(/\//g, '');
+    return hashWithoutSlash;
   }
 
   async createTable(createTableDto: CreateTableDto): Promise<TableDocument> {
