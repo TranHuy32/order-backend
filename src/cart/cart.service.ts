@@ -159,18 +159,13 @@ export class CartService {
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
     }
-    let historyCarts = allCarts;
-    if (body.table && body.customer_name) {
-      historyCarts = allCarts.filter(
-        (cart) =>
-          cart.table === body.table &&
-          cart.customer_name === body.customer_name,
-      );
-      if (historyCarts.length === 0) {
-        return 'No matching carts found';
-      }
+    const historyCarts = allCarts.filter(
+      (cart) =>
+        cart.table === body.table && cart.customer_name === body.customer_name,
+    );
+    if (historyCarts.length === 0) {
+      return 'No matching carts found';
     }
-
     if (q.time !== undefined) {
       const currentTime = moment(); // Lấy thời gian hiện tại
       const filteredCarts = historyCarts.filter((cart) => {
