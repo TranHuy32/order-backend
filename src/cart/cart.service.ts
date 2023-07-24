@@ -154,43 +154,33 @@ export class CartService {
     }
   }
 
-  async findHistoryCarts(q?: any, body?: any): Promise<any> {
+  async findHistoryCarts(q?: any): Promise<any> {
     const allCarts = await this.cartRepository.findObjectWithoutLimit();
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
     }
     const historyCarts = allCarts.filter(
       (cart) =>
-        cart.table === body.table && cart.customer_name === body.customer_name,
+        cart.table === q.table && cart.customer_name === q.customer_name,
     );
     if (historyCarts.length === 0) {
       return 'No matching carts found';
     }
-    if (q.time !== undefined) {
-      const currentTime = moment(); // Lấy thời gian hiện tại
-      const filteredCarts = historyCarts.filter((cart) => {
-        const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
-        const timeDifference = moment
-          .duration(currentTime.diff(createdAt))
-          .asMinutes(); // Tính khoảng thời gian trong phút
-        return timeDifference <= q.time; // Lọc ra những yêu cầu trong vòng `time` phút
-      });
-      let responseAllCarts = [];
-      for (const cart of filteredCarts) {
-        const responseAllCart = await this.getCartOption(cart, false);
-        responseAllCarts.push(responseAllCart);
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
-    } else {
-      let responseAllCarts = [];
-      for (const cart of historyCarts) {
-        const responseAllCart = await this.getCartOption(cart, false);
-        responseAllCarts.push(responseAllCart);
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
+    const currentTime = moment(); // Lấy thời gian hiện tại
+    const filteredCarts = historyCarts.filter((cart) => {
+      const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+      const timeDifference = moment
+        .duration(currentTime.diff(createdAt))
+        .asMinutes(); // Tính khoảng thời gian trong phút
+      return timeDifference <= 120; // Lọc ra những yêu cầu trong vòng `time` phút
+    });
+    let responseAllCarts = [];
+    for (const cart of filteredCarts) {
+      const responseAllCart = await this.getCartOption(cart, false);
+      responseAllCarts.push(responseAllCart);
     }
+    responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+    return responseAllCarts;
   }
 
   // async findAllCartsBackLog(limit?: number): Promise<any> {
