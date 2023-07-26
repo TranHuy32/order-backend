@@ -17,6 +17,8 @@ export class CallStaffService {
   async createCallStaff(
     createCallStaffDto: CreateCallStaffDto,
   ): Promise<CallStaffDocument> {
+    console.log(createCallStaffDto);
+
     const newCallStaff = Object.assign(createCallStaffDto);
     const existingTable = await this.tableService.findTableByName(
       createCallStaffDto.table,
@@ -37,6 +39,7 @@ export class CallStaffService {
       _id: callStaffCreated._id,
       table: callStaffCreated.table,
       createdAt: callStaffCreated.createAt,
+      customer_name: callStaffCreated.customer_name,
     };
     this.eventsGateway.createCallStaff(dataSocket);
 
@@ -56,7 +59,6 @@ export class CallStaffService {
         const timeDifference = moment
           .duration(currentTime.diff(createdAt))
           .asMinutes(); // Tính khoảng thời gian trong phút
-
         return timeDifference <= time; // Lọc ra những yêu cầu trong vòng `time` phút
       });
       const reversedCallStaffs = filteredCallStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
@@ -65,6 +67,7 @@ export class CallStaffService {
           _id: callStaff._id,
           table: callStaff.table,
           createdAt: callStaff.createAt,
+          customer_name: callStaff.customer_name,
         };
       });
     } else {
@@ -74,9 +77,42 @@ export class CallStaffService {
           _id: callStaff._id,
           table: callStaff.table,
           createdAt: callStaff.createAt,
+          customer_name: callStaff.customer_name,
         };
       });
     }
+  }
+
+  async findAllCallStaffCustomer(q?: any): Promise<any> {
+    const callStaffs = await this.callStaffRepository.findObjectWithoutLimit();
+    if (callStaffs === null || callStaffs.length === 0) {
+      return 'No call staff created';
+    }
+    const historyCallStaffs = callStaffs.filter(
+      (callStaff) =>
+        callStaff.table === q.table &&
+        callStaff.customer_name === q.customer_name,
+    );    
+    if (historyCallStaffs.length === 0) {
+      return 'No matching call staff found';
+    }
+    const currentTime = moment(); // Lấy thời gian hiện tại
+    const filteredCallStaffs = historyCallStaffs.filter((callStaff) => {
+      const createdAt = moment(callStaff.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+      const timeDifference = moment
+        .duration(currentTime.diff(createdAt))
+        .asMinutes(); // Tính khoảng thời gian trong phút
+      return timeDifference <= 120;
+    });
+    const reversedCallStaffs = filteredCallStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
+    return reversedCallStaffs.map((callStaff) => {
+      return {
+        _id: callStaff._id,
+        table: callStaff.table,
+        createdAt: callStaff.createAt,
+        customer_name: callStaff.customer_name,
+      };
+    });
   }
 
   async deleteCallStaff(id: string): Promise<any> {
