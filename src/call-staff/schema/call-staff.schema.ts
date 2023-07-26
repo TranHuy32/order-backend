@@ -9,6 +9,8 @@ export class CallStaff {
   table: string;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ default: null })
+  customer_name: string;
 }
 
 export const CallStaffSchema = SchemaFactory.createForClass(CallStaff);

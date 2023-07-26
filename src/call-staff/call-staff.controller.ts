@@ -31,6 +31,11 @@ export class CallStaffController {
     return this.callStaffService.findAllCallStaff(query.time);
   }
 
+  @Get('/customer')
+  async allCallStaffByCustomer(@Query() query: any) {
+    return this.callStaffService.findAllCallStaffCustomer(query);
+  }
+
   // @UseGuards(CashierAuthGuard)
   @Delete('delete/:id')
   async deleteCallStaff(@Param('id') id: string) {
