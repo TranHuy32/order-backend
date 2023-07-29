@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepository } from './repository/cart.repository';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { CartDocument } from './schema/cart.schema';
+import { CartDocument, CartStatus } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
 import { DishRepository } from 'src/dish/repository/dish.repository';
-
 
 @Injectable()
 export class CartService {
@@ -14,8 +13,7 @@ export class CartService {
     private readonly cartRepository: CartRepository,
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
-  ) { }
-
+  ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
@@ -23,7 +21,9 @@ export class CartService {
     }
     const orderItems = [];
     for (const orderItem of cart.order) {
-      const dish = await this.dishRepository.findOneObject({ _id: orderItem.dish_id });
+      const dish = await this.dishRepository.findOneObject({
+        _id: orderItem.dish_id,
+      });
       if (dish) {
         orderItems.push({
           ...orderItem,
@@ -39,7 +39,7 @@ export class CartService {
       order: orderItems,
       note: cart.note,
       total: cart.total,
-      // status: cart.status,
+      status: cart.status,
       table: cart.table,
       createAt: cart.createAt,
     };
@@ -116,25 +116,24 @@ export class CartService {
   //   return responeAllcartes;
   // }
 
-
   async findCartById(_id: string): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
     return await this.getCartOption(cart, true);
   }
 
-  // async setStatus(_id: string, status: CartStatus): Promise<any> {
-  //   const cart = await this.cartRepository.findOneObject({ _id });
-  //   if (!cart) {
-  //     return 'the cart has not been created yet';
-  //   } else {
-  //     if (status === cart.status) {
-  //       return cart;
-  //     }
-  //     cart.status = status;
-  //     await cart.save();
-  //     return cart;
-  //   }
-  // }
+  async setStatus(_id: string, status: CartStatus): Promise<any> {
+    const cart = await this.cartRepository.findOneObject({ _id });
+    if (!cart) {
+      return 'the cart has not been created yet';
+    } else {
+      if (status === cart.status) {
+        return cart;
+      }
+      cart.status = status;
+      await cart.save();
+      return cart;
+    }
+  }
 
   async updateCart(
     _id: string,
@@ -159,5 +158,4 @@ export class CartService {
     await cart.save();
     return cart;
   }
-
 }

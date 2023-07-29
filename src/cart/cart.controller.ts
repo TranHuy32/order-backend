@@ -1,7 +1,7 @@
 import { Body, Get, Put, Post, Controller, Param, Query } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { Cart, CartDocument } from './schema/cart.schema';
+import { Cart, CartDocument, CartStatus } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 
@@ -36,13 +36,13 @@ export class CartController {
   // }
 
   // Status cart
-  // @Put('/status/:id')
-  // async setStatus(
-  //     @Param('id') id: string,
-  //     @Body('status') status: CartStatus,
-  // ): Promise<CartResponse> {
-  //     return this.cartService.setStatus(id, status);
-  // }
+  @Put('/status/:id')
+  async setStatus(
+    @Param('id') id: string,
+    @Body('status') status: CartStatus,
+  ): Promise<CartResponse> {
+    return this.cartService.setStatus(id, status);
+  }
 
   // Update cart
   @Put('update/:id')
@@ -53,4 +53,3 @@ export class CartController {
     return this.cartService.updateCart(id, updateCartDto);
   }
 }
-
