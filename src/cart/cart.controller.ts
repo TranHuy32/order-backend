@@ -42,13 +42,13 @@ export class CartController {
   // }
 
   // Status cart
-  // @Put('/status/:id')
-  // async setStatus(
-  //     @Param('id') id: string,
-  //     @Body('status') status: CartStatus,
-  // ): Promise<CartResponse> {
-  //     return this.cartService.setStatus(id, status);
-  // }
+  @Put('/status/:id')
+  async setStatus(
+      @Param('id') id: string,
+      @Body('status') status: CartStatus,
+  ): Promise<CartResponse> {
+      return this.cartService.setStatus(id, status);
+  }
 
   // Update cart
   @Put('update/:id')

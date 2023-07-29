@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepository } from './repository/cart.repository';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { CartDocument } from './schema/cart.schema';
+import { CartDocument, CartStatus } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
@@ -41,7 +41,7 @@ export class CartService {
       order: orderItems,
       note: cart.note,
       total: cart.total,
-      // status: cart.status,
+      status: cart.status,
       table: cart.table,
       createAt: cart.createAt,
       customer_name: cart.customer_name,
@@ -205,19 +205,19 @@ export class CartService {
     return await this.getCartOption(cart, true);
   }
 
-  // async setStatus(_id: string, status: CartStatus): Promise<any> {
-  //   const cart = await this.cartRepository.findOneObject({ _id });
-  //   if (!cart) {
-  //     return 'the cart has not been created yet';
-  //   } else {
-  //     if (status === cart.status) {
-  //       return cart;
-  //     }
-  //     cart.status = status;
-  //     await cart.save();
-  //     return cart;
-  //   }
-  // }
+  async setStatus(_id: string, status: CartStatus): Promise<any> {
+    const cart = await this.cartRepository.findOneObject({ _id });
+    if (!cart) {
+      return 'the cart has not been created yet';
+    } else {
+      if (status === cart.status) {
+        return cart;
+      }
+      cart.status = status;
+      await cart.save();
+      return cart;
+    }
+  }
 
   async updateCart(
     _id: string,
