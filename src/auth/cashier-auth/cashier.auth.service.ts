@@ -40,7 +40,7 @@ export class CashierAuthService {
     );
     if (!cashier) return false;
     const token = await this._createToken(cashier, false);
-    return { ...token };
+    return { ...token, cashier };
   }
 
   // register
@@ -66,7 +66,7 @@ export class CashierAuthService {
         payload.cashier.cashierName,
       );      
       const newAccessToken = await this._createToken(cashier, true);
-      return newAccessToken;
+      return {newAccessToken, cashier};
     } catch (e) {
       return 'Invalid token';
     }
