@@ -144,6 +144,28 @@ export class DishService {
     return responeAllDishes;
   }
 
+  async findAllDishesActivedByCashier(
+    cashierId: string,
+    limit?: number,
+  ): Promise<any> {
+    const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
+    const filteredDishes = dishes.filter(
+      (dish) => dish.cashier_id === cashierId,
+    );
+    let responeAllDishes = <any>[];
+    const filterAllDishes = filteredDishes.filter(
+      (allDishes) => allDishes.isActive === true,
+    );
+    const limitedDishes = limit
+      ? filterAllDishes.slice(0, limit)
+      : filterAllDishes;
+    for (const allDish of limitedDishes) {
+      const responeAllDish = await this.getDishOption(allDish, true);
+      responeAllDishes.push(responeAllDish);
+    }
+    return responeAllDishes;
+  }
+
   async findBestSeller(limit?: number): Promise<any> {
     const allDishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
     let responeAllDishes = <any>[];

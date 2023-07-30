@@ -70,6 +70,15 @@ export class DishController {
   }
 
   // All dishes actived
+  @Get('menu/activedByCashier/:cashierId')
+  async findAllDishActivedByCashier(
+    @Query() query,
+    @Param('cashierId') cashierId: string,
+  ): Promise<Dish[]> {
+    return this.dishService.findAllDishesActivedByCashier(cashierId, query.limit);
+  }
+
+  // All dishes actived
   @Get('menu/all-hidden')
   async findAllDishHidden(@Query() query): Promise<Dish[]> {
     return this.dishService.findAllDishesHidden(query.limit);
