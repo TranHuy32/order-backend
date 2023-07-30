@@ -23,6 +23,8 @@ export class Dish {
   isBestSeller: boolean;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ required: true })
+  cashier_id: string;
   @Prop({ default: null })
   updateAt: string;
   @Prop()

@@ -9,12 +9,26 @@ export class CategoryService {
 
   async createCategory(
     createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryDocument> {
+  ): Promise<CategoryDocument> {    
     return this.categoryRepository.createObject(createCategoryDto);
   }
 
   async findCategory(name: string): Promise<CategoryDocument> {
     return this.categoryRepository.findOneObject({ name });
+  }
+
+  async findCategoryByCashier(
+    name: string,
+    cashier_id: string,
+  ): Promise<CategoryDocument> {
+    //  const categories = this.categoryRepository.findOneObject({ cashier_id });
+    const category = await this.categoryRepository.findOneObject({
+      name,
+      cashier_id,
+    });
+    console.log(category);
+    //  const foundCategory = categories.find((category) => category.name === name);
+    return category;
   }
 
   async findAllCatrgories(): Promise<any> {
@@ -26,10 +40,28 @@ export class CategoryService {
       return {
         _id: category._id,
         name: category.name,
+        cashier_id: category.cashier_id,
       };
     });
   }
-  
+
+  async findAllCatrgoriesByCashier(cashierId: string): Promise<any> {
+    const categories = await this.categoryRepository.findObjectWithoutLimit();
+    const filteredCategories = categories.filter(
+      (cat) => cat.cashier_id === cashierId,
+    );
+    if (filteredCategories === null || filteredCategories.length === 0) {
+      return 'No categories created';
+    }
+    return filteredCategories.map((category) => {
+      return {
+        _id: category._id,
+        name: category.name,
+        cashier_id: category.cashier_id,
+      };
+    });
+  }
+
   async deleteCategory(id: string): Promise<any> {
     if (await this.categoryRepository.deleteObjectById(id)) {
       return 'Successful delete';

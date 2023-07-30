@@ -4,15 +4,20 @@ import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) { }
+  constructor(private readonly categoryService: CategoryService) {}
 
   // all category
   @Get('/all')
   async allCategory() {
     return this.categoryService.findAllCatrgories();
   }
-  
-  // @UseGuards(CashierAuthGuard)
+
+  @Get('/allByCashier/:id')
+  async allCategoryByCashier(@Param('id') id: string) {
+    return this.categoryService.findAllCatrgoriesByCashier(id);
+  }
+
+  @UseGuards(CashierAuthGuard)
   @Delete('delete/:id')
   async deleteCategory(@Param('id') id: string) {
     return this.categoryService.deleteCategory(id);

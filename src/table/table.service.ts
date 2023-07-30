@@ -20,14 +20,18 @@ export class TableService {
     return hashWithoutSlash;
   }
 
-  async createTable(createTableDto: CreateTableDto): Promise<TableDocument> {
+  async createTable(
+    createTableDto: CreateTableDto,
+    cashierId: any,
+  ): Promise<TableDocument> {
     const name = createTableDto.name;
-    const existingTable = await this.tableRepository.findOneObject({ name });
+    const existingTable = await this.findTableByNameForCreate(name, cashierId);
     if (existingTable) {
       throw new Error('This table already exists');
     }
     const newTable = Object.assign(createTableDto);
     newTable.token = await this.hashToken(name);
+    newTable.cashier_id = cashierId;
     newTable.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -49,8 +53,62 @@ export class TableService {
     });
   }
 
-  async findTableByName(name: string): Promise<TableDocument> {
-    const existingTable = await this.tableRepository.findOneObject({ name });
+  async findAllTablesByCashier(cashierId: any): Promise<any> {
+    const tables = await this.tableRepository.findObjectWithoutLimit();
+    if (tables === null || tables.length === 0) {
+      throw new Error('No table created');
+    }
+
+    const filteredTables = tables.filter(
+      (table) => table.cashier_id === cashierId,
+    );
+
+    return filteredTables.map((table) => {
+      return {
+        _id: table._id,
+        name: table.name,
+        isActive: table.isActive,
+        cashier_id: table.cashier_id,
+        token: table.token,
+      };
+    });
+  }
+
+  async findTableByNameForCreate(
+    name: string,
+    cashierId: any,
+  ): Promise<TableDocument> {
+    const tables = await this.tableRepository.findObjectWithoutLimit();
+    if (tables === null || tables.length === 0) {
+      return null;
+    }
+    const filteredTables = tables.filter(
+      (table) => table.cashier_id === cashierId,
+    );
+    const existingTable = filteredTables.find((table) => table.name === name);
+    if (!existingTable) {
+      return null;
+    }
+    return existingTable;
+  }
+
+  async findTableByName(name: string, cashierId: any): Promise<TableDocument> {
+    const tables = await this.tableRepository.findObjectWithoutLimit();
+    if (tables === null || tables.length === 0) {
+      throw new Error('No table created');
+    }
+    const filteredTables = tables.filter(
+      (table) => table.cashier_id === cashierId,
+    );
+    const existingTable = filteredTables.find((table) => table.name === name);
+    if (!existingTable) {
+      throw new Error('The table does not existed');
+    }
+    return existingTable;
+  }
+
+  async findTableById(_id: string): Promise<TableDocument> {
+    const existingTable = await this.tableRepository.findOneObject({ _id });
     if (!existingTable) {
       throw new Error('The table does not existed');
     }
@@ -65,8 +123,8 @@ export class TableService {
     return existingTable;
   }
 
-  async deleteTable(name: string): Promise<any> {
-    const table = await this.tableRepository.findOneObject({ name });
+  async deleteTable(_id: string): Promise<any> {
+    const table = await this.tableRepository.findOneObject({ _id });
     if (!table) {
       throw new Error('The table does not existed');
     }
@@ -76,8 +134,20 @@ export class TableService {
     return 'Invalid table';
   }
 
-  async activeTable(name: string, isActive: boolean): Promise<TableDocument> {
-    const table = await this.tableRepository.findOneObject({ name });
+  async deleteTableById(_id: string): Promise<any> {
+    const table = await this.tableRepository.findOneObject({ _id });
+    if (!table) {
+      throw new Error('The table does not existed');
+    }
+    if (await this.tableRepository.deleteObjectById(table._id)) {
+      return 'Successful delete';
+    }
+    return 'Invalid table';
+  }
+
+  async activeTable(_id: string, isActive: boolean): Promise<TableDocument> {
+    console.log(_id);
+    const table = await this.tableRepository.findOneObject({ _id });
     if (!table) {
       throw new Error('The table does not existed');
     }

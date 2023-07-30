@@ -15,6 +15,8 @@ export class Table {
   createAt: string;
   @Prop({ default: null })
   updateAt: string;
+  @Prop({ required: true })
+  cashier_id: string;
 }
 
 export const TableSchema = SchemaFactory.createForClass(Table);

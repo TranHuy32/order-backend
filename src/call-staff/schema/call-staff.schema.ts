@@ -9,6 +9,8 @@ export class CallStaff {
   table: string;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ required: true })
+  cashier_id: string;
   @Prop({ default: null })
   customer_name: string;
 }

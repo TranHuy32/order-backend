@@ -1,20 +1,42 @@
-import { Body, Get, Put, Post, Controller, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Get,
+  Put,
+  Post,
+  Controller,
+  Param,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { Cart, CartDocument } from './schema/cart.schema';
+import { Cart, CartDocument, CartStatus } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   // Tạo cart
-  @Post('create')
-  async createDish(
+  // @UseGuards(CashierAuthGuard)
+  // @Post('create')
+  // async createDish(
+  //   @Body() createCartDto: CreateCartDto,
+  // ): Promise<CartDocument> {
+  //   return this.cartService.createCart(createCartDto);
+  // }
+
+  @Post('create/:cashierId  ')
+  async createDishByCashier(
     @Body() createCartDto: CreateCartDto,
+    @Param('cashierId') cashierId: string,
+    // @Req() req: any,
   ): Promise<CartDocument> {
-    return this.cartService.createCart(createCartDto);
+    // const reqUser = req.user;    
+    return this.cartService.createCartByCashier(createCartDto, cashierId);
   }
 
   // Cart detail
@@ -29,12 +51,29 @@ export class CartController {
     return this.cartService.findAllCarts(query);
   }
 
-  // History cart
-  @Get('history/all')
-  async findCartByCustomer(@Query() query): Promise<Cart[]> {
-    return this.cartService.findHistoryCarts(query);
+  @Get('menu/all/:cashierId')
+  async findAllCartsByCashier(
+    @Query() query,
+    @Param('cashierId') cashierId: string,
+  ): Promise<Cart[]> {
+    return this.cartService.findAllCartsByCashier(cashierId, query);
   }
-  
+
+  // History cart
+  // @Get('history/all')
+  // async findCartByCustomer(@Query() query): Promise<Cart[]> {
+  //   return this.cartService.findHistoryCarts(query);
+  // }
+
+  // History cart by cashier
+  @Get('history/all/:cashierId')
+  async findCartByCustomer(
+    @Query() query,
+    @Param('cashierId') cashierId: string,
+  ): Promise<Cart[]> {
+    return this.cartService.findHistoryCarts(cashierId, query);
+  }
+
   // All carts backlog
   // @Get('menu/backlog')
   // async findAllCartsBackLog(@Query() query): Promise<Cart[]> {
@@ -42,15 +81,19 @@ export class CartController {
   // }
 
   // Status cart
-  // @Put('/status/:id')
-  // async setStatus(
-  //     @Param('id') id: string,
-  //     @Body('status') status: CartStatus,
-  // ): Promise<CartResponse> {
-  //     return this.cartService.setStatus(id, status);
-  // }
+  @UseGuards(CashierAuthGuard)
+  @Put('/status/:id')
+  async setStatus(
+    @Param('id') id: string,
+    @Body('status') status: CartStatus,
+    @Req() req: any,
+  ): Promise<CartResponse> {
+    // const cashier = req.user;
+    return this.cartService.setStatus(id, status);
+  }
 
   // Update cart
+  @UseGuards(CashierAuthGuard)
   @Put('update/:id')
   async updateDish(
     @Param('id') id: string,

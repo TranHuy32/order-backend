@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CallStaffService } from './call-staff.service';
@@ -18,11 +19,23 @@ export class CallStaffController {
   constructor(private readonly callStaffService: CallStaffService) {}
 
   // Tạo call staff
-  @Post('create')
-  async createCallStaff(
+  // @Post('create')
+  // async createCallStaff(
+  //   @Body() createCallStaffDto: CreateCallStaffDto,
+  // ): Promise<CallStaffDocument> {
+  //   return this.callStaffService.createCallStaff(createCallStaffDto);
+  // }
+
+  // Tạo call staff
+  @Post('create/:cashierId')
+  async createCallStaffByCashier(
     @Body() createCallStaffDto: CreateCallStaffDto,
+    @Param('cashierId') cashierId: string,
   ): Promise<CallStaffDocument> {
-    return this.callStaffService.createCallStaff(createCallStaffDto);
+    return this.callStaffService.createCallStaffByCashier(
+      createCallStaffDto,
+      cashierId,
+    );
   }
 
   // all call staff
@@ -31,12 +44,27 @@ export class CallStaffController {
     return this.callStaffService.findAllCallStaff(query.time);
   }
 
-  @Get('/customer')
-  async allCallStaffByCustomer(@Query() query: any) {
-    return this.callStaffService.findAllCallStaffCustomer(query);
+  // all call staff by Cashier
+  @Get('/all/:cashierId')
+  async allCallStaffByCashierId(
+    @Query() query: any,
+    @Param('cashierId') cashierId: string,
+  ) {
+    return this.callStaffService.findAllCallStaffByCashier(
+      cashierId,
+      query.time,
+    );
   }
 
-  // @UseGuards(CashierAuthGuard)
+  @Get('/customer/:cashierId')
+  async allCallStaffByCustomer(
+    @Query() query: any,
+    @Param('cashierId') cashierId: string,
+  ) {
+    return this.callStaffService.findAllCallStaffCustomer(cashierId, query);
+  }
+
+  @UseGuards(CashierAuthGuard)
   @Delete('delete/:id')
   async deleteCallStaff(@Param('id') id: string) {
     return this.callStaffService.deleteCallStaff(id);
