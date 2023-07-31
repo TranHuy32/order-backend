@@ -29,7 +29,7 @@ export class CartController {
   //   return this.cartService.createCart(createCartDto);
   // }
 
-  @Post('/create/:cashierId  ')
+  @Post('/create/:cashierId')
   async createDishByCashier(
     @Body() createCartDto: CreateCartDto,
     @Param('cashierId') cashierId: string,
