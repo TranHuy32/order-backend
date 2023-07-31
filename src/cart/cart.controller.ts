@@ -29,13 +29,11 @@ export class CartController {
   //   return this.cartService.createCart(createCartDto);
   // }
 
-  @Post('create/:cashierId  ')
+  @Post('create/:cashierId')
   async createDishByCashier(
     @Body() createCartDto: CreateCartDto,
     @Param('cashierId') cashierId: string,
-    // @Req() req: any,
   ): Promise<CartDocument> {
-    // const reqUser = req.user;    
     return this.cartService.createCartByCashier(createCartDto, cashierId);
   }
 
