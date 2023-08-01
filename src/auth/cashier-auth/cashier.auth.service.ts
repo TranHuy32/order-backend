@@ -4,12 +4,14 @@ import { CashierService } from 'src/cashier/cashier.service';
 import { CreateCashierDto } from 'src/cashier/dto/create-cashier.dto';
 import { ExistingCashier } from 'src/cashier/dto/exisiting-cashier.dto';
 import { CashierDocument } from 'src/cashier/schema/cashier.schema';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class CashierAuthService {
   constructor(
     private readonly cashierService: CashierService,
     private readonly jwtService: JwtService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   // Tao token
@@ -40,6 +42,7 @@ export class CashierAuthService {
     );
     if (!cashier) return false;
     const token = await this._createToken(cashier, false);
+    await this.eventsGateway.login(token);
     return { ...token, cashier };
   }
 
@@ -64,9 +67,9 @@ export class CashierAuthService {
       const cashier = await this.cashierService.getCashierByRefresh(
         refreshToken,
         payload.cashier.cashierName,
-      );      
+      );
       const newAccessToken = await this._createToken(cashier, true);
-      return {newAccessToken, cashier};
+      return { newAccessToken, cashier };
     } catch (e) {
       return 'Invalid token';
     }

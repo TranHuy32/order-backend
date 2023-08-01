@@ -42,7 +42,7 @@ export class CallStaffService {
       createdAt: callStaffCreated.createAt,
       customer_name: callStaffCreated.customer_name,
     };
-    this.eventsGateway.createCallStaff(dataSocket);
+    await this.eventsGateway.createCallStaff(dataSocket);
 
     return callStaffCreated;
   }
@@ -75,7 +75,7 @@ export class CallStaffService {
       createdAt: callStaffCreated.createAt,
       customer_name: callStaffCreated.customer_name,
     };
-    this.eventsGateway.createCallStaff(dataSocket);
+    await this.eventsGateway.createCallStaff(dataSocket);
 
     return callStaffCreated;
   }

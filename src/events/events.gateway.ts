@@ -82,4 +82,16 @@ export class EventsGateway {
     this.server.emit('activeTable', data);
     return data;
   }
+
+  @SubscribeMessage('changeStatus')
+  async changeStatus(@MessageBody() data: any): Promise<any> {
+    this.server.emit('statusChanged', data);
+    return data;
+  }
+
+  @SubscribeMessage('login')
+  async login(@MessageBody() data: any): Promise<any> {
+    this.server.emit('anotherLogin', data);
+    return data;
+  }
 }

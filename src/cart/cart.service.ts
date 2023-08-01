@@ -94,7 +94,7 @@ export class CartService {
     });
     const newCartCreated = await this.cartRepository.createObject(newCart);
     const dataSocket = await this.getCartOption(newCartCreated, false);
-    this.eventsGateway.createCart(dataSocket);
+    await this.eventsGateway.createCart(dataSocket);
     return newCartCreated;
   }
 
@@ -104,11 +104,11 @@ export class CartService {
   ): Promise<CartDocument> {
     const newCart = Object.assign(createCartDto);
     console.log(cashierId);
-    
+
     const existingTable = await this.tableService.findTableByName(
       createCartDto.table,
       cashierId,
-    );    
+    );
     if (!existingTable) {
       throw new Error('The table does not exist');
     }
@@ -147,7 +147,7 @@ export class CartService {
     });
     const newCartCreated = await this.cartRepository.createObject(newCart);
     const dataSocket = await this.getCartOption(newCartCreated, false);
-    this.eventsGateway.createCart(dataSocket);
+    await this.eventsGateway.createCart(dataSocket);
     return newCartCreated;
   }
 
@@ -324,6 +324,7 @@ export class CartService {
       }
       cart.status = status;
       await cart.save();
+      await this.eventsGateway.changeStatus(status);
       return cart;
     }
   }
