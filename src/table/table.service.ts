@@ -25,13 +25,16 @@ export class TableService {
     cashierId: any,
   ): Promise<TableDocument> {
     const name = createTableDto.name;
-    const existingTable = await this.findTableByNameForCreate(name, cashierId);
+    const existingTable = await this.findTableByNameForCreate(
+      name,
+      createTableDto.cashier_id,
+    );
     if (existingTable) {
       throw new Error('This table already exists');
     }
     const newTable = Object.assign(createTableDto);
     newTable.token = await this.hashToken(name);
-    newTable.cashier_id = cashierId;
+    // newTable.cashier_id = cashierId;
     newTable.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
