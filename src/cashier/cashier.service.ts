@@ -15,7 +15,7 @@ export class CashierService {
 
   // Kiem tra nguoi dung
   async validateCashier(cashierName: string, password: string) {
-    const cashier = await this.findByCashierName(cashierName);    
+    const cashier = await this.findByCashierName(cashierName);
     if (!cashier) return null;
     const doesPasswordMath = await bcrypt.compare(password, cashier.password);
     if (!doesPasswordMath) return null;
@@ -38,7 +38,7 @@ export class CashierService {
   }
 
   // Tim kiem cashier theo cashierName
-  async findByCashierName(cashierName: string): Promise<CashierDocument> {    
+  async findByCashierName(cashierName: string): Promise<CashierDocument> {
     return this.cashierRepository.findOneObject({ cashierName });
   }
 
@@ -57,11 +57,11 @@ export class CashierService {
       existingCashier.refreshToken = update.refreshToken;
     }
     console.log(existingCashier);
-    
+
     return existingCashier.save();
   }
   async getCashierByRefresh(refreshToken: string, cashierName: string) {
-    const cashier = await this.findByCashierName(cashierName);    
+    const cashier = await this.findByCashierName(cashierName);
     if (!cashier) {
       throw new HttpException('not found cashier', HttpStatus.UNAUTHORIZED);
     }
@@ -77,10 +77,34 @@ export class CashierService {
 
   // get cashier detail
   async getByCashierName(cashierName: string): Promise<CashierDocument> {
-    const cashier = this.cashierRepository.findOneObject({ cashierName });
+    const cashier = await this.cashierRepository.findOneObject({ cashierName });
     if (!cashier) {
       throw new HttpException('not found cashier', HttpStatus.UNAUTHORIZED);
     }
     return cashier;
+  }
+
+  async getByCashierId(_id: string): Promise<any> {
+    const cashier = await this.cashierRepository.findOneObject({ _id });
+    if (!cashier) {
+      throw new HttpException('not found cashier', HttpStatus.UNAUTHORIZED);
+    }
+    return {
+      id: cashier._id,
+      name: cashier.name,
+    };
+  }
+
+  async findAllCashier(): Promise<any> {
+    const cashiers = await this.cashierRepository.findObjectWithoutLimit();
+    if (cashiers === null || cashiers.length === 0) {
+      return [];
+    }
+    return cashiers.map((cashier) => {
+      return {
+        id: cashier._id,
+        name: cashier.name,
+      };
+    });
   }
 }
