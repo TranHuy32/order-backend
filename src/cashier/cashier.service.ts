@@ -92,6 +92,7 @@ export class CashierService {
     return {
       id: cashier._id,
       name: cashier.name,
+      cashierName: cashier.cashierName,
     };
   }
 
@@ -104,6 +105,7 @@ export class CashierService {
       return {
         id: cashier._id,
         name: cashier.name,
+        cashierName: cashier.cashierName,
       };
     });
   }
