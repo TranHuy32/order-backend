@@ -6,10 +6,10 @@ import { CashierModule } from 'src/cashier/cashier.module';
 import { CashierAuthController } from './cashier.auth.controller';
 import { CashierJwtStrategy } from './strategies/jwt.strategy';
 import { CashierAuthService } from './cashier.auth.service';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
-    CashierModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -21,6 +21,8 @@ import { CashierAuthService } from './cashier.auth.service';
       }),
       inject: [ConfigService],
     }),
+    CashierModule,
+    EventsModule,
   ],
   controllers: [CashierAuthController],
   providers: [CashierAuthService, CashierJwtStrategy],
