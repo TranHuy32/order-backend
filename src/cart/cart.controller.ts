@@ -49,7 +49,7 @@ export class CartController {
     return this.cartService.findAllCarts(query);
   }
 
-  @Get('menu/all/:cashierId')
+  @Get('menu/allByCashier/:cashierId')
   async findAllCartsByCashier(
     @Query() query,
     @Param('cashierId') cashierId: string,
