@@ -132,19 +132,19 @@ export class CashierService {
     if (!cashier) {
       return false;
     }
-    if (updateCashierDto.name) {
-      cashier.name = updateCashierDto.name;
-      cashier.updatedAt = new Date().toLocaleString('en-GB', {
-        hour12: false,
-      });
-    }
-    if (updateCashierDto.newPassword && updateCashierDto.oldPassword) {
-      const cashierValidate = await this.validateCashier(
-        updateCashierDto.cashierName,
-        updateCashierDto.oldPassword,
-      );
-      if (!cashierValidate) return 'Wrong password';
-      if (cashierValidate) {
+    const cashierValidate = await this.validateCashier(
+      updateCashierDto.cashierName,
+      updateCashierDto.oldPassword,
+    );
+    if (!cashierValidate) return 'Wrong password';
+    if (cashierValidate) {
+      if (updateCashierDto.name) {
+        cashier.name = updateCashierDto.name;
+        cashier.updatedAt = new Date().toLocaleString('en-GB', {
+          hour12: false,
+        });
+      }
+      if (updateCashierDto.newPassword && updateCashierDto.oldPassword) {
         cashier.password = await this.hashPassword(
           updateCashierDto.newPassword,
         );
