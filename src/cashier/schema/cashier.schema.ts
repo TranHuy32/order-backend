@@ -13,6 +13,10 @@ export class Cashier {
   password: string;
   @Prop()
   refreshToken: string;
+  @Prop({ default: null })
+  createdAt: string;
+  @Prop({ default: null })
+  updatedAt: string;
 }
 
 export const CashierSchema = SchemaFactory.createForClass(Cashier);

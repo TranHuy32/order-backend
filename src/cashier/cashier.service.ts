@@ -3,6 +3,7 @@ import { CashierRepository } from './repository/cashier.repository';
 import * as bcrypt from 'bcrypt';
 import { CashierDocument } from './schema/cashier.schema';
 import { CreateCashierDto } from './dto/create-cashier.dto';
+import { UpdateCashierDto } from './dto/update-cashier.dto';
 
 @Injectable()
 export class CashierService {
@@ -15,6 +16,8 @@ export class CashierService {
 
   // Kiem tra nguoi dung
   async validateCashier(cashierName: string, password: string) {
+    console.log(password);
+
     const cashier = await this.findByCashierName(cashierName);
     if (!cashier) return null;
     const doesPasswordMath = await bcrypt.compare(password, cashier.password);
@@ -108,5 +111,49 @@ export class CashierService {
         cashierName: cashier.cashierName,
       };
     });
+  }
+
+  async deleteCashier(_id: string): Promise<any> {
+    const cashier = await this.cashierRepository.findOneObject({ _id });
+    if (!cashier) {
+      return false;
+    }
+    if (await this.cashierRepository.deleteObjectById(cashier._id)) {
+      return true;
+    }
+    return false;
+  }
+
+  async updateCashier(
+    _id: string,
+    updateCashierDto: UpdateCashierDto,
+  ): Promise<any> {
+    const cashier = await this.cashierRepository.findOneObject({ _id });
+    if (!cashier) {
+      return false;
+    }
+    if (updateCashierDto.name) {
+      cashier.name = updateCashierDto.name;
+      cashier.updatedAt = new Date().toLocaleString('en-GB', {
+        hour12: false,
+      });
+    }
+    if (updateCashierDto.newPassword && updateCashierDto.oldPassword) {
+      const cashierValidate = await this.validateCashier(
+        updateCashierDto.cashierName,
+        updateCashierDto.oldPassword,
+      );
+      if (!cashierValidate) return 'Wrong password';
+      if (cashierValidate) {
+        cashier.password = await this.hashPassword(
+          updateCashierDto.newPassword,
+        );
+        cashier.updatedAt = new Date().toLocaleString('en-GB', {
+          hour12: false,
+        });
+      }
+    }
+    cashier.save();
+    return true;
   }
 }

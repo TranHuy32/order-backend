@@ -55,6 +55,9 @@ export class CashierAuthService {
     newCashier.password = await this.cashierService.hashPassword(
       newCashier.password,
     );
+    newCashier.createdAt = new Date().toLocaleString('en-GB', {
+      hour12: false,
+    });
     return this.cashierService.createCashier(newCashier);
   }
 
