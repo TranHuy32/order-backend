@@ -144,7 +144,7 @@ export class CashierService {
           hour12: false,
         });
       }
-      if (updateCashierDto.newPassword && updateCashierDto.oldPassword) {
+      if (updateCashierDto.newPassword) {
         cashier.password = await this.hashPassword(
           updateCashierDto.newPassword,
         );
