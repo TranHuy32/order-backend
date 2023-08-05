@@ -26,7 +26,6 @@ export class CategoryService {
       name,
       cashier_id,
     });
-    console.log(category);
     //  const foundCategory = categories.find((category) => category.name === name);
     return category;
   }
