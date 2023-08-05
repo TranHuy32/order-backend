@@ -165,6 +165,30 @@ export class CartService {
     return result;
   }
 
+  async findObjectsByDateByCashier(
+    date: string,
+    cashierId: string,
+  ): Promise<CartDocument[] | any> {
+    const startOfDay = moment(date, 'DD/MM/YYYY')
+      .startOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const endOfDay = moment(date, 'DD/MM/YYYY')
+      .endOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    });
+
+    const result = cartByCreated.filter(
+      (cart) => cart.cashier_id === cashierId,
+    );
+    if (result === null || result.length === 0) {
+      return 'No carts created';
+    }
+    return result;
+  }
+
   async findAllCarts(q?: any): Promise<any> {
     const allCarts = await this.cartRepository.findObjectWithoutLimit();
     if (allCarts === null || allCarts.length === 0) {
@@ -237,7 +261,10 @@ export class CartService {
       responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
       return responseAllCarts;
     } else if (q.date !== undefined) {
-      const cartsByDate = await this.findObjectsByDate(q.date);
+      const cartsByDate = await this.findObjectsByDateByCashier(
+        q.date,
+        cashierId,
+      );
       // if (cartsByDate === null || cartsByDate.length === 0) {
       //   return 'No carts created on the specified date';
       // }
