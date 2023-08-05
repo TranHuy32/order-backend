@@ -42,7 +42,7 @@ export class CashierAuthService {
     );
     if (!cashier) return false;
     const token = await this._createToken(cashier, false);
-    await this.eventsGateway.login(cashier);
+    await this.eventsGateway.login(token);
     return { ...token, cashier };
   }
 
