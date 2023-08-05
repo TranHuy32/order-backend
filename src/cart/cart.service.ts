@@ -236,8 +236,6 @@ export class CartService {
   }
 
   async findAllCartsByCashier(cashierId: string, q?: any): Promise<any> {
-    console.log(cashierId);
-
     const allCartsNoCashier =
       await this.cartRepository.findObjectWithoutLimit();
     const allCarts = allCartsNoCashier.filter(
