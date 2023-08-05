@@ -54,8 +54,9 @@ export class DishService {
     );
     newDish.image_detail_id = imageDetailCreated.id;
     newDish.categories_name = [];
-    const category = await this.categoryService.findCategory(
+    const category = await this.categoryService.findCategoryByCashier(
       createDishDto.category,
+      cashierId,
     );
     if (!category) {
       const categoryCreated = await this.categoryService.createCategory(
