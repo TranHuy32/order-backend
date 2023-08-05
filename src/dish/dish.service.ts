@@ -58,6 +58,7 @@ export class DishService {
       createDishDto.category,
       cashierId,
     );
+    console.log(category);
     if (!category) {
       const categoryCreated = await this.categoryService.createCategory(
         new CreateCategoryDto(createDishDto.category, cashierId),
