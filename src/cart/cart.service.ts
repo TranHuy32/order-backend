@@ -151,7 +151,7 @@ export class CartService {
     return newCartCreated;
   }
 
-  async findObjectsByDate(date: string): Promise<CartDocument[] | null> {
+  async findObjectsByDate(date: string): Promise<CartDocument[] | any> {
     const startOfDay = moment(date, 'DD/MM/YYYY')
       .startOf('day')
       .format('DD/MM/YYYY, HH:mm:ss');
@@ -162,6 +162,30 @@ export class CartService {
       $gte: startOfDay,
       $lte: endOfDay,
     });
+    return result;
+  }
+
+  async findObjectsByDateByCashier(
+    date: string,
+    cashierId: string,
+  ): Promise<CartDocument[] | any> {
+    const startOfDay = moment(date, 'DD/MM/YYYY')
+      .startOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const endOfDay = moment(date, 'DD/MM/YYYY')
+      .endOf('day')
+      .format('DD/MM/YYYY, HH:mm:ss');
+    const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    });
+
+    const result = cartByCreated.filter(
+      (cart) => cart.cashier_id === cashierId,
+    );
+    if (result === null || result.length === 0) {
+      return 'No carts created';
+    }
     return result;
   }
 
@@ -212,7 +236,7 @@ export class CartService {
 
   async findAllCartsByCashier(cashierId: string, q?: any): Promise<any> {
     console.log(cashierId);
-    
+
     const allCartsNoCashier =
       await this.cartRepository.findObjectWithoutLimit();
     const allCarts = allCartsNoCashier.filter(
@@ -239,7 +263,10 @@ export class CartService {
       responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
       return responseAllCarts;
     } else if (q.date !== undefined) {
-      const cartsByDate = await this.findObjectsByDate(q.date);
+      const cartsByDate = await this.findObjectsByDateByCashier(
+        q.date,
+        cashierId,
+      );
       // if (cartsByDate === null || cartsByDate.length === 0) {
       //   return 'No carts created on the specified date';
       // }
