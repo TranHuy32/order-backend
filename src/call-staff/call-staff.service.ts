@@ -74,6 +74,7 @@ export class CallStaffService {
       table: callStaffCreated.table,
       createdAt: callStaffCreated.createAt,
       customer_name: callStaffCreated.customer_name,
+      cashier_id: callStaffCreated.customer_name,
     };
     await this.eventsGateway.createCallStaff(dataSocket);
 
