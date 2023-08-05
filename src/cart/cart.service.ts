@@ -45,6 +45,7 @@ export class CartService {
       table: cart.table,
       createAt: cart.createAt,
       customer_name: cart.customer_name,
+      cashier_id: cart.cashier_id,
     };
   }
 
