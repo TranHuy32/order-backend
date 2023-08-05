@@ -218,10 +218,6 @@ export class CartService {
     const allCarts = allCartsNoCashier.filter(
       (cart) => cart.cashier_id === cashierId,
     );
-    console.log(allCartsNoCashier);
-    
-    console.log(allCarts);
-    
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
     }
