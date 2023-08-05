@@ -211,11 +211,17 @@ export class CartService {
   }
 
   async findAllCartsByCashier(cashierId: string, q?: any): Promise<any> {
+    console.log(cashierId);
+    
     const allCartsNoCashier =
       await this.cartRepository.findObjectWithoutLimit();
     const allCarts = allCartsNoCashier.filter(
       (cart) => cart.cashier_id === cashierId,
     );
+    console.log(allCartsNoCashier);
+    
+    console.log(allCarts);
+    
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
     }
