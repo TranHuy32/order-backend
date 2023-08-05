@@ -155,6 +155,7 @@ export class CallStaffService {
           table: callStaff.table,
           createdAt: callStaff.createAt,
           customer_name: callStaff.customer_name,
+          cashier_id: callStaff.cashier_id,
         };
       });
     }
