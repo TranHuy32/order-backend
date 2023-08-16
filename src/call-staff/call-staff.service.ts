@@ -157,6 +157,7 @@ export class CallStaffService {
           createdAt: callStaff.createAt,
           customer_name: callStaff.customer_name,
           cashier_id: callStaff.cashier_id,
+          isChecked: callStaff.isChecked
         };
       });
     }
@@ -196,6 +197,21 @@ export class CallStaffService {
         customer_name: callStaff.customer_name,
       };
     });
+  }
+
+  async checkCallStaff(_id: string): Promise<boolean> {
+    try {
+      const callStaff = await this.callStaffRepository.findOneObject({ _id });      
+      if (!callStaff.isChecked) {
+        callStaff.isChecked = true;
+        callStaff.save();
+        return true;
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 
   async deleteCallStaff(id: string): Promise<any> {

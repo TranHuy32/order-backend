@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -62,6 +63,12 @@ export class CallStaffController {
     @Param('cashierId') cashierId: string,
   ) {
     return this.callStaffService.findAllCallStaffCustomer(cashierId, query);
+  }
+
+  @UseGuards(CashierAuthGuard)
+  @Put('check/:id')
+  async checkCallStaff(@Param('id') id: string) {
+    return this.callStaffService.checkCallStaff(id);
   }
 
   @UseGuards(CashierAuthGuard)

@@ -8,11 +8,13 @@ export class CallStaff {
   @Prop({ required: true })
   table: string;
   @Prop({ required: true })
-  createAt: string;
-  @Prop({ required: true })
   cashier_id: string;
   @Prop({ default: null })
   customer_name: string;
+  @Prop({ default: false })
+  isChecked: boolean;
+  @Prop({ required: true })
+  createAt: string;
 }
 
 export const CallStaffSchema = SchemaFactory.createForClass(CallStaff);
