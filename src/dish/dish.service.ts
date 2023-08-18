@@ -345,13 +345,10 @@ export class DishService {
         dish.options = [];
       }
 
-      // Sử dụng vòng lặp để kiểm tra và loại bỏ các tùy chọn
-      const updatedOptions = [];
-      for (const option of dish.options) {
-        if (!options.includes(option)) {
-          updatedOptions.push(option);
-        }
-      }
+      // Sử dụng indexOf để kiểm tra và loại bỏ các tùy chọn
+      const updatedOptions = dish.options.filter(
+        (option) => options.indexOf(option) === -1,
+      );
       dish.options = updatedOptions;
 
       await dish.save();
