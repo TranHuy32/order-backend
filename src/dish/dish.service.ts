@@ -337,8 +337,6 @@ export class DishService {
   }
 
   async deleteOption(_id: string, optionToDelete: string): Promise<any> {
-    console.log(optionToDelete);
-
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
       return 'The dish has not been created yet';
