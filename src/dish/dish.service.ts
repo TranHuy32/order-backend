@@ -341,13 +341,18 @@ export class DishService {
     if (!dish) {
       return 'The dish has not been created yet';
     } else {
-      // Kiểm tra và khởi tạo dish.options nếu cần
       if (!Array.isArray(dish.options)) {
         dish.options = [];
       }
 
-      // Tiến hành filter và xóa các tùy chọn khỏi mảng
-      dish.options = dish.options.filter((option) => !options.includes(option));
+      // Sử dụng vòng lặp để kiểm tra và loại bỏ các tùy chọn
+      const updatedOptions = [];
+      for (const option of dish.options) {
+        if (!options.includes(option)) {
+          updatedOptions.push(option);
+        }
+      }
+      dish.options = updatedOptions;
 
       await dish.save();
       return dish;
