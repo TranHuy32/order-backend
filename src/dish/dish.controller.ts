@@ -182,10 +182,8 @@ export class DishController {
   @Delete('delete-option/:id')
   async deleteOption(
     @Param('id') id: string,
-    @Body('option') option: string[],
+    @Req() req: any,
   ): Promise<DishDocument> {
-    console.log(option);
-
-    return this.dishService.deleteOption(id, option);
+    return this.dishService.deleteOption(id, req.option);
   }
 }
