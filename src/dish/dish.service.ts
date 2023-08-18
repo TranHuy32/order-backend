@@ -336,14 +336,14 @@ export class DishService {
     }
   }
 
-  async deleteOption(_id: string, options: string[]): Promise<any> {
+  async deleteOption(_id: string, optionToDelete: string): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
       return 'The dish has not been created yet';
     } else {
       if (Array.isArray(dish.options)) {
         dish.options = dish.options.filter(
-          (option) => !options.includes(option),
+          (option) => option !== optionToDelete,
         );
       }
       await dish.save();

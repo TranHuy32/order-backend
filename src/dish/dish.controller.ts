@@ -74,7 +74,10 @@ export class DishController {
     @Query() query,
     @Param('cashierId') cashierId: string,
   ): Promise<Dish[]> {
-    return this.dishService.findAllDishesActivedByCashier(cashierId, query.limit);
+    return this.dishService.findAllDishesActivedByCashier(
+      cashierId,
+      query.limit,
+    );
   }
 
   // All dishes hidden
@@ -175,12 +178,12 @@ export class DishController {
   }
 
   // Delete option
-  @UseGuards(CashierAuthGuard)
+  // @UseGuards(CashierAuthGuard)
   @Delete('delete-option/:id')
   async deleteOption(
     @Param('id') id: string,
-    @Body('option') option: string[],
+    @Query() q: any,
   ): Promise<DishDocument> {
-    return this.dishService.deleteOption(id, option);
+    return this.dishService.deleteOption(id, q.option);
   }
 }

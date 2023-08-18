@@ -352,7 +352,7 @@ export class CartService {
       }
       cart.status = status;
       await cart.save();
-      await this.eventsGateway.changeStatus(status);
+      await this.eventsGateway.status(cart);
       return cart;
     }
   }
