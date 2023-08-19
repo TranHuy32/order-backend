@@ -12,7 +12,7 @@ services:
     image: mongo-express
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongo
-      - ME_CONFIG_MONGODB_PORT=27021
+      - ME_CONFIG_MONGODB_PORT=27017
     depends_on:
       - mongo
     ports:
