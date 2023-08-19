@@ -1,9 +1,9 @@
 version: '3.8'
 services:
   mongo:
-    container_name: qr-order
+    container_name: bunca29
     image: mongo
     environment:
-      - MONGO_DATABASE="qr-order"
+      - MONGO_DATABASE="bunca29"
     ports:
-      - 27019:27017
+      - 27021:27017
