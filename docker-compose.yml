@@ -7,7 +7,7 @@ services:
       - MONGO_DATABASE="bunca29"
     ports:
       - 27021:27017
-mongo-express:
+  mongo-express:
     container_name: bunca29-express
     image: mongo-express
     environment:
