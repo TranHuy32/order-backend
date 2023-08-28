@@ -10,6 +10,7 @@ import { TableModule } from './table/table.module';
 import { CallStaffModule } from './call-staff/call-staff.module';
 import { CashierAuthModule } from './auth/cashier-auth/cashier.auth.module';
 import { EventsModule } from './events/events.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { EventsModule } from './events/events.module';
     CallStaffModule,
     CashierAuthModule,
     EventsModule,
+    GroupModule
   ],
   controllers: [],
   providers: [],

@@ -2,14 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryDocument } from './schema/category.schema';
 import { CategoryRepository } from './repository/category.repository';
+import { CashierService } from 'src/cashier/cashier.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly cashierService: CashierService,
+  ) {}
 
   async createCategory(
     createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryDocument> {    
+  ): Promise<CategoryDocument> {
     return this.categoryRepository.createObject(createCategoryDto);
   }
 
@@ -19,15 +23,14 @@ export class CategoryService {
 
   async findCategoryByCashier(
     name: string,
-    cashier_id: string,
+    cashierId: string,
   ): Promise<CategoryDocument> {
-    //  const categories = this.categoryRepository.findOneObject({ cashier_id });
+    const cashier = await this.cashierService.getByCashierId(cashierId);
+    const group_id = cashier.group_id;
     const category = await this.categoryRepository.findOneObject({
       name,
-      cashier_id,
+      group_id,
     });
-    console.log(category);
-    //  const foundCategory = categories.find((category) => category.name === name);
     return category;
   }
 
@@ -40,15 +43,15 @@ export class CategoryService {
       return {
         _id: category._id,
         name: category.name,
-        cashier_id: category.cashier_id,
+        group_id: category.group_id,
       };
     });
   }
 
-  async findAllCatrgoriesByCashier(cashierId: string): Promise<any> {
+  async findAllCatrgoriesByCashier(groupId: string): Promise<any> {
     const categories = await this.categoryRepository.findObjectWithoutLimit();
     const filteredCategories = categories.filter(
-      (cat) => cat.cashier_id === cashierId,
+      (cat) => cat.group_id === groupId,
     );
     if (filteredCategories === null || filteredCategories.length === 0) {
       return 'No categories created';
@@ -57,7 +60,7 @@ export class CategoryService {
       return {
         _id: category._id,
         name: category.name,
-        cashier_id: category.cashier_id,
+        group_id: category.group_id,
       };
     });
   }

@@ -20,21 +20,12 @@ import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  // Tạo cart
-  // @UseGuards(CashierAuthGuard)
-  // @Post('create')
-  // async createDish(
-  //   @Body() createCartDto: CreateCartDto,
-  // ): Promise<CartDocument> {
-  //   return this.cartService.createCart(createCartDto);
-  // }
-
-  @Post('create/:cashierId')
-  async createDishByCashier(
+  @Post('create/:groupId')
+  async createDishByGroup(
     @Body() createCartDto: CreateCartDto,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<CartDocument> {
-    return this.cartService.createCartByCashier(createCartDto, cashierId);
+    return this.cartService.createCartByGroup(createCartDto, groupId);
   }
 
   // Cart detail
@@ -43,40 +34,24 @@ export class CartController {
     return this.cartService.findCartById(id);
   }
 
-  // All carts
-  @Get('menu/all')
-  async findAllCarts(@Query() query): Promise<Cart[]> {
-    return this.cartService.findAllCarts(query);
-  }
-
-  @Get('menu/allByCashier/:cashierId')
+  @Get('menu/allByCashier/:groupId')
   async findAllCartsByCashier(
     @Query() query,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<Cart[]> {
-    return this.cartService.findAllCartsByCashier(cashierId, query);
+    return this.cartService.findAllCartsByGroup(groupId, query);
   }
 
-  // History cart
-  // @Get('history/all')
-  // async findCartByCustomer(@Query() query): Promise<Cart[]> {
-  //   return this.cartService.findHistoryCarts(query);
-  // }
 
-  // History cart by cashier
-  @Get('history/all/:cashierId')
+  // History cart by group
+  @Get('history/all/:groupId')
   async findCartByCustomer(
     @Query() query,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<Cart[]> {
-    return this.cartService.findHistoryCarts(cashierId, query);
+    return this.cartService.findHistoryCarts(groupId, query);
   }
 
-  // All carts backlog
-  // @Get('menu/backlog')
-  // async findAllCartsBackLog(@Query() query): Promise<Cart[]> {
-  //     return this.cartService.findAllCartsBackLog(query.limit);
-  // }
 
   // Status cart
   @UseGuards(CashierAuthGuard)
@@ -86,7 +61,6 @@ export class CartController {
     @Body('status') status: CartStatus,
     @Req() req: any,
   ): Promise<CartResponse> {
-    // const cashier = req.user;
     return this.cartService.setStatus(id, status);
   }
 

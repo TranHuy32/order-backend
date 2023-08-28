@@ -10,12 +10,14 @@ import { ImageResponse } from 'src/image/dto/image-response.dto';
 import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { EventsGateway } from 'src/events/events.gateway';
+import { CashierService } from 'src/cashier/cashier.service';
 @Injectable()
 export class DishService {
   constructor(
     private readonly dishRepository: DishRepository,
     private readonly imageService: ImageService,
     private readonly categoryService: CategoryService,
+    private readonly cashierService: CashierService,
     private readonly eventsGateway: EventsGateway,
   ) {}
 
@@ -54,18 +56,20 @@ export class DishService {
     );
     newDish.image_detail_id = imageDetailCreated.id;
     newDish.categories_name = [];
-    const category = await this.categoryService.findCategory(
+    const cashier = await this.cashierService.getByCashierId(cashierId);
+    const category = await this.categoryService.findCategoryByCashier(
       createDishDto.category,
+      cashierId,
     );
     if (!category) {
       const categoryCreated = await this.categoryService.createCategory(
-        new CreateCategoryDto(createDishDto.category, cashierId),
+        new CreateCategoryDto(createDishDto.category, cashier.group_id),
       );
       newDish.categories_name.push(categoryCreated.name);
     } else {
       newDish.categories_name.push(category.name);
     }
-    newDish.cashier_id = cashierId;
+    newDish.group_id = cashier.group_id;
     newDish.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -90,14 +94,10 @@ export class DishService {
     }
     return responeAllDishes;
   }
-  async findAllDishesByCashier(
-    cashierId: string,
-    limit?: number,
-  ): Promise<any> {
+
+  async findAllDishesByCashier(groupId: string, limit?: number): Promise<any> {
     const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    const filteredDishes = dishes.filter(
-      (dish) => dish.cashier_id === cashierId,
-    );
+    const filteredDishes = dishes.filter((dish) => dish.group_id === groupId);
     let responeAllDishes = <any>[];
     const limitedDishes = limit
       ? filteredDishes.slice(0, limit)
@@ -109,30 +109,12 @@ export class DishService {
     return responeAllDishes;
   }
 
-  async findAllDishesActived(limit?: number): Promise<any> {
-    const allDishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    let responeAllDishes = <any>[];
-    const filterAllDishes = allDishes.filter(
-      (allDishes) => allDishes.isActive === true,
-    );
-    const limitedDishes = limit
-      ? filterAllDishes.slice(0, limit)
-      : filterAllDishes;
-    for (const allDish of limitedDishes) {
-      const responeAllDish = await this.getDishOption(allDish, true);
-      responeAllDishes.push(responeAllDish);
-    }
-    return responeAllDishes;
-  }
-
   async findAllDishesActivedByCashier(
-    cashierId: string,
+    groupId: string,
     limit?: number,
   ): Promise<any> {
     const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    const filteredDishes = dishes.filter(
-      (dish) => dish.cashier_id === cashierId,
-    );
+    const filteredDishes = dishes.filter((dish) => dish.group_id === groupId);
     let responeAllDishes = <any>[];
     const filterAllDishes = filteredDishes.filter(
       (allDishes) => allDishes.isActive === true,
@@ -147,11 +129,9 @@ export class DishService {
     return responeAllDishes;
   }
 
-  async findAllDishesHidden(cashierId: string, limit?: number): Promise<any> {
+  async findAllDishesHidden(groupId: string, limit?: number): Promise<any> {
     const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    const filteredDishes = dishes.filter(
-      (dish) => dish.cashier_id === cashierId,
-    );
+    const filteredDishes = dishes.filter((dish) => dish.group_id === groupId);
     let responeAllDishes = <any>[];
     const filterAllDishes = filteredDishes.filter(
       (allDishes) => allDishes.isActive === false,
@@ -166,32 +146,13 @@ export class DishService {
     return responeAllDishes;
   }
 
-  async findBestSeller(limit?: number): Promise<any> {
-    const allDishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
-    let responeAllDishes = <any>[];
-    const filterActiveDishes = allDishes.filter(
-      (allDishes) => allDishes.isActive === true,
-    );
-    const filterBestSellerDishes = filterActiveDishes.filter(
-      (filterActiveDishes) => filterActiveDishes.isBestSeller === true,
-    );
-    const limitedDishes = limit
-      ? filterBestSellerDishes.slice(0, limit)
-      : filterBestSellerDishes;
-    for (const allDish of limitedDishes) {
-      const responeAllDish = await this.getDishOption(allDish, true);
-      responeAllDishes.push(responeAllDish);
-    }
-    return responeAllDishes;
-  }
-
   async findBestSellerByCashier(
-    cashierId: string,
+    groupId: string,
     limit?: number,
   ): Promise<any> {
-    const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới
+    const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới\
     const filteredDishes = dishes.filter(
-      (dish) => dish.cashier_id === cashierId,
+      (dish) => dish.group_id === groupId,
     );
     let responeAllDishes = <any>[];
     const filterActiveDishes = filteredDishes.filter(
@@ -208,25 +169,6 @@ export class DishService {
       responeAllDishes.push(responeAllDish);
     }
     return responeAllDishes;
-  }
-
-  async findsByCategory(categoryName: string, limit?: number): Promise<any> {
-    const dishes = await this.dishRepository.findObjectsBy(
-      'category',
-      categoryName,
-    );
-    let responseDishes: any[] = [];
-    const filterActiveDishes = dishes.filter(
-      (dishes) => dishes.isActive === true,
-    );
-    const limitedDishes = limit
-      ? filterActiveDishes.slice(0, limit)
-      : filterActiveDishes;
-    for (const dish of limitedDishes) {
-      const responseDish = await this.getDishOption(dish, false);
-      responseDishes.push(responseDish);
-    }
-    return responseDishes;
   }
 
   async activeDish(_id: string, isActive: boolean): Promise<any> {
@@ -276,6 +218,7 @@ export class DishService {
     cashierId: string,
   ): Promise<DishDocument> {
     const dish = await this.dishRepository.findOneObject({ _id });
+    const cashier = await this.cashierService.getByCashierId(cashierId);
     if (imageDetail) {
       const imageUpdate = new CreateImageDto();
       const imageDetailCreated = await this.imageService.createImage(
@@ -290,7 +233,7 @@ export class DishService {
       );
       if (!category) {
         const categoryCreated = await this.categoryService.createCategory(
-          new CreateCategoryDto(updateDishDto.category, cashierId),
+          new CreateCategoryDto(updateDishDto.category, cashier.group_id),
         );
         dish.category = categoryCreated.name;
       } else {
@@ -314,7 +257,6 @@ export class DishService {
     });
     await dish.save();
     return await this.getDishOption(dish, true);
-    // return dish;
   }
 
   async addOption(_id: string, options: string[]): Promise<any> {

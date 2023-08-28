@@ -14,15 +14,14 @@ export class CallStaffService {
     private readonly eventsGateway: EventsGateway,
   ) {}
 
-  async createCallStaff(
+  async createCallStaffByGroup(
     createCallStaffDto: CreateCallStaffDto,
+    group_id: string,
   ): Promise<CallStaffDocument> {
-    //Sửa chô này
-    const cashier = null;
     const newCallStaff = Object.assign(createCallStaffDto);
     const existingTable = await this.tableService.findTableByName(
       createCallStaffDto.table,
-      cashier,
+      group_id,
     );
     if (!existingTable) {
       throw new Error('The table does not exist');
@@ -30,6 +29,7 @@ export class CallStaffService {
     // if (!existingTable.isActive) {
     //   throw new Error('This table is not active');
     // }
+    newCallStaff.group_id = group_id;
     newCallStaff.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -41,91 +41,18 @@ export class CallStaffService {
       table: callStaffCreated.table,
       createdAt: callStaffCreated.createAt,
       customer_name: callStaffCreated.customer_name,
+      group_id: callStaffCreated.group_id,
     };
     await this.eventsGateway.createCallStaff(dataSocket);
 
     return callStaffCreated;
   }
 
-  async createCallStaffByCashier(
-    createCallStaffDto: CreateCallStaffDto,
-    cashierId: string,
-  ): Promise<CallStaffDocument> {
-    const newCallStaff = Object.assign(createCallStaffDto);
-    const existingTable = await this.tableService.findTableByName(
-      createCallStaffDto.table,
-      cashierId,
-    );
-    if (!existingTable) {
-      throw new Error('The table does not exist');
-    }
-    // if (!existingTable.isActive) {
-    //   throw new Error('This table is not active');
-    // }
-    newCallStaff.cashier_id = cashierId;
-    newCallStaff.createAt = new Date().toLocaleString('en-GB', {
-      hour12: false,
-    });
-    const callStaffCreated = await this.callStaffRepository.createObject(
-      newCallStaff,
-    );
-    const dataSocket = {
-      _id: callStaffCreated._id,
-      table: callStaffCreated.table,
-      createdAt: callStaffCreated.createAt,
-      customer_name: callStaffCreated.customer_name,
-      cashier_id: callStaffCreated.cashier_id,
-    };
-    await this.eventsGateway.createCallStaff(dataSocket);
-
-    return callStaffCreated;
-  }
-
-  async findAllCallStaff(time?: number): Promise<any> {
-    const callStaffs = await this.callStaffRepository.findObjectWithoutLimit();
-    if (callStaffs === null || callStaffs.length === 0) {
-      return 'No call staff created';
-    }
-
-    if (time !== undefined) {
-      const currentTime = moment(); // Lấy thời gian hiện tại
-      const filteredCallStaffs = callStaffs.filter((callStaff) => {
-        const createdAt = moment(callStaff.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
-        const timeDifference = moment
-          .duration(currentTime.diff(createdAt))
-          .asMinutes(); // Tính khoảng thời gian trong phút
-        return timeDifference <= time; // Lọc ra những yêu cầu trong vòng `time` phút
-      });
-      const reversedCallStaffs = filteredCallStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
-      return reversedCallStaffs.map((callStaff) => {
-        return {
-          _id: callStaff._id,
-          table: callStaff.table,
-          createdAt: callStaff.createAt,
-          customer_name: callStaff.customer_name,
-        };
-      });
-    } else {
-      const reversedCallStaffs = callStaffs.reverse(); // Đảo ngược thứ tự các phần tử trong mảng
-      return reversedCallStaffs.map((callStaff) => {
-        return {
-          _id: callStaff._id,
-          table: callStaff.table,
-          createdAt: callStaff.createAt,
-          customer_name: callStaff.customer_name,
-        };
-      });
-    }
-  }
-
-  async findAllCallStaffByCashier(
-    cashierId: string,
-    time?: number,
-  ): Promise<any> {
+  async findAllCallStaffByGroup(groupId: string, time?: number): Promise<any> {
     const callStaffsNoCashier =
       await this.callStaffRepository.findObjectWithoutLimit();
     const callStaffs = callStaffsNoCashier.filter(
-      (callStaff) => callStaff.cashier_id === cashierId,
+      (callStaff) => callStaff.group_id === groupId,
     );
     if (callStaffs === null || callStaffs.length === 0) {
       return 'No call staff created';
@@ -145,7 +72,9 @@ export class CallStaffService {
           _id: callStaff._id,
           table: callStaff.table,
           createdAt: callStaff.createAt,
+          group_id: callStaff.group_id,
           customer_name: callStaff.customer_name,
+          isChecked: callStaff.isChecked,
         };
       });
     } else {
@@ -156,18 +85,18 @@ export class CallStaffService {
           table: callStaff.table,
           createdAt: callStaff.createAt,
           customer_name: callStaff.customer_name,
-          cashier_id: callStaff.cashier_id,
-          isChecked: callStaff.isChecked
+          group_id: callStaff.group_id,
+          isChecked: callStaff.isChecked,
         };
       });
     }
   }
 
-  async findAllCallStaffCustomer(cashierId: string, q?: any): Promise<any> {
+  async findAllCallStaffCustomer(group_id: string, q?: any): Promise<any> {
     const callStaffsNoCashier =
       await this.callStaffRepository.findObjectWithoutLimit();
     const callStaffs = callStaffsNoCashier.filter(
-      (callStaff) => callStaff.cashier_id === cashierId,
+      (callStaff) => callStaff.group_id === group_id,
     );
     if (callStaffs === null || callStaffs.length === 0) {
       return 'No call staff created';
@@ -201,7 +130,7 @@ export class CallStaffService {
 
   async checkCallStaff(_id: string): Promise<boolean> {
     try {
-      const callStaff = await this.callStaffRepository.findOneObject({ _id });      
+      const callStaff = await this.callStaffRepository.findOneObject({ _id });
       if (!callStaff.isChecked) {
         callStaff.isChecked = true;
         callStaff.save();

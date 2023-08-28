@@ -10,6 +10,7 @@ import { DishController } from './dish.controller';
 import { DishService } from './dish.service';
 import { DishRepository } from './repository/dish.repository';
 import { EventsModule } from 'src/events/events.module';
+import { CashierModule } from 'src/cashier/cashier.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { EventsModule } from 'src/events/events.module';
     ImageModule,
     CategoryModule,
     EventsModule,
+    CashierModule,
   ],
   controllers: [DishController],
   providers: [DishService, DishRepository],

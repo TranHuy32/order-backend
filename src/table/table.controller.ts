@@ -35,15 +35,9 @@ export class TableController {
   }
 
   // @UseGuards(CashierAuthGuard)
-  @Get('/all')
-  async allTables() {
-    return this.tableService.findAllTables();
-  }
-
-  // @UseGuards(CashierAuthGuard)
-  @Get('/allByCashier/:cashierId')
-  async allTablesByCashier(@Param('cashierId') cashierId: string) {
-    return this.tableService.findAllTablesByCashier(cashierId);
+  @Get('/allByCashier/:groupId')
+  async allTablesByCashier(@Param('groupId') groupId: string) {
+    return this.tableService.findAllTablesByCashier(groupId);
   }
 
   @UseGuards(CashierAuthGuard)

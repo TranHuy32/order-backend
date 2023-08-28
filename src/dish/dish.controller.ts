@@ -55,70 +55,42 @@ export class DishController {
   }
 
   // All dishes by cashier
-  @Get('menu/allByCashier/:cashierId')
-  async findAllDishByCashier(
+  @Get('menu/allByCashier/:groupId')
+  async findAllDishByGroup(
     @Query() query,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<Dish[]> {
-    return this.dishService.findAllDishesByCashier(cashierId, query.limit);
+    console.log(groupId);
+
+    return this.dishService.findAllDishesByCashier(groupId, query.limit);
   }
 
-  // All dishes actived
-  @Get('menu/all-actived')
-  async findAllDishActived(@Query() query): Promise<Dish[]> {
-    return this.dishService.findAllDishesActived(query.limit);
-  }
-
-  @Get('menu/activedByCashier/:cashierId')
-  async findAllDishActivedByCashier(
+  @Get('menu/activedByCashier/:groupId')
+  async findAllDishActivedByGroup(
     @Query() query,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<Dish[]> {
-    return this.dishService.findAllDishesActivedByCashier(
-      cashierId,
-      query.limit,
-    );
-  }
-
-  // All dishes hidden
-  @Get('menu/all-hidden')
-  async findAllDishHidden(@Query() query): Promise<Dish[]> {
-    return this.dishService.findAllDishesHidden(query.limit);
+    return this.dishService.findAllDishesActivedByCashier(groupId, query.limit);
   }
 
   // All dishes hidden by cashier
   // @UseGuards(CashierAuthGuard)
-  @Get('menu/allHiddenByCashier/:cashierId')
+  @Get('menu/allHiddenByCashier/:groupId')
   async findAllDishHiddenByCashier(
     @Query() query,
-    @Param('cashierId') cashierId: any,
+    @Param('groupId') groupId: any,
   ): Promise<Dish[]> {
-    return this.dishService.findAllDishesHidden(cashierId, query.limit);
+    return this.dishService.findAllDishesHidden(groupId, query.limit);
   }
-
-  // All dishes best-seller
-  // @Get('menu/best-seller')
-  // async findBestSeller(@Query() query): Promise<Dish[]> {
-  //   return this.dishService.findBestSeller(query.limit);
-  // }
 
   // All dishes best-seller by cashier
-  @Get('menu/bestSellerByCashier/:cashierId')
+  @Get('menu/bestSellerByCashier/:groupId')
   async findBestSellerByCashier(
     @Query() query,
-    @Param('cashierId') cashierId: any,
+    @Param('groupId') groupId: any,
   ): Promise<Dish[]> {
-    return this.dishService.findBestSellerByCashier(cashierId, query.limit);
+    return this.dishService.findBestSellerByCashier(groupId, query.limit);
   }
-
-  // All dishes by category
-  // @Get('/category/:categoryName')
-  // async findDishesByCategory(
-  //   @Param('categoryName') categoryName: string,
-  //   @Query() query,
-  // ): Promise<Dish[]> {
-  //   return this.dishService.findsByCategory(categoryName, query.limit);
-  // }
 
   // Active dish
   @UseGuards(CashierAuthGuard)
@@ -132,12 +104,12 @@ export class DishController {
 
   // Set best seller dish
   @UseGuards(CashierAuthGuard)
-  @Put('/best-seller/:cashierId')
+  @Put('/best-seller/:dishId')
   async bestSeller(
-    @Param('cashierId') cashierId: string,
+    @Param('dishId') dishId: string,
     @Body('isBestSeller') isBestSeller: boolean,
   ): Promise<DishResponse> {
-    return this.dishService.isBestSeller(cashierId, isBestSeller);
+    return this.dishService.isBestSeller(dishId, isBestSeller);
   }
 
   // Delete dish

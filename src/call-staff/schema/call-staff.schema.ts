@@ -8,7 +8,7 @@ export class CallStaff {
   @Prop({ required: true })
   table: string;
   @Prop({ required: true })
-  cashier_id: string;
+  group_id: string;
   @Prop({ default: null })
   customer_name: string;
   @Prop({ default: false })

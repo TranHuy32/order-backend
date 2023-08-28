@@ -45,70 +45,18 @@ export class CartService {
       table: cart.table,
       createAt: cart.createAt,
       customer_name: cart.customer_name,
-      cashier_id: cart.cashier_id,
+      group_id: cart.group_id,
     };
   }
 
-  async createCart(createCartDto: CreateCartDto): Promise<CartDocument> {
-    // sửa phần cashier
-    const cashier = null;
-    const newCart = Object.assign(createCartDto);
-    const existingTable = await this.tableService.findTableByName(
-      createCartDto.table,
-      cashier,
-    );
-    if (!existingTable) {
-      throw new Error('The table does not exist');
-    }
-    if (!existingTable.isActive) {
-      throw new Error('This table is not active');
-    }
-    if (newCart.order.length === 0) {
-      throw new Error('The order does not contain any dishes');
-    }
-    for (const dishOrder of newCart.order) {
-      const dish = await this.dishRepository.findOneObject({
-        _id: dishOrder.dish_id,
-      });
-      if (!dish) {
-        throw new Error(`Dish with ID ${dishOrder.dish_id} does not exist`);
-      }
-      if (dish.amount <= 0) {
-        throw new Error(`Dish with ID ${dishOrder.dish_id} is out of stock`);
-      }
-      if (dish.amount < dishOrder.number) {
-        throw new Error(
-          `Dish with ID ${dishOrder.dish_id} does not have enough quantity`,
-        );
-      }
-    }
-    for (const dishOrder of newCart.order) {
-      const dish = await this.dishRepository.findOneObject({
-        _id: dishOrder.dish_id,
-      });
-      dish.amount -= dishOrder.number;
-      await dish.save();
-    }
-
-    newCart.createAt = new Date().toLocaleString('en-GB', {
-      hour12: false,
-    });
-    const newCartCreated = await this.cartRepository.createObject(newCart);
-    const dataSocket = await this.getCartOption(newCartCreated, false);
-    await this.eventsGateway.createCart(dataSocket);
-    return newCartCreated;
-  }
-
-  async createCartByCashier(
+  async createCartByGroup(
     createCartDto: CreateCartDto,
-    cashierId: string,
+    group_id: string,
   ): Promise<CartDocument> {
     const newCart = Object.assign(createCartDto);
-    console.log(cashierId);
-
     const existingTable = await this.tableService.findTableByName(
       createCartDto.table,
-      cashierId,
+      group_id,
     );
     if (!existingTable) {
       throw new Error('The table does not exist');
@@ -142,7 +90,7 @@ export class CartService {
       dish.amount -= dishOrder.number;
       await dish.save();
     }
-    newCart.cashier_id = cashierId;
+    newCart.group_id = group_id;
     newCart.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
@@ -166,9 +114,9 @@ export class CartService {
     return result;
   }
 
-  async findObjectsByDateByCashier(
+  async findObjectsByDateByGroup(
     date: string,
-    cashierId: string,
+    groupId: string,
   ): Promise<CartDocument[] | any> {
     const startOfDay = moment(date, 'DD/MM/YYYY')
       .startOf('day')
@@ -179,67 +127,19 @@ export class CartService {
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
-    });
-
-    const result = cartByCreated.filter(
-      (cart) => cart.cashier_id === cashierId,
-    );
+    });    
+    const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
       return 'No carts created';
     }
     return result;
   }
 
-  async findAllCarts(q?: any): Promise<any> {
-    const allCarts = await this.cartRepository.findObjectWithoutLimit();
-    if (allCarts === null || allCarts.length === 0) {
-      return 'No carts created';
-    }
-    if (q.time !== undefined) {
-      const currentTime = moment(); // Lấy thời gian hiện tại
-      const filteredCarts = allCarts.filter((cart) => {
-        const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
-        const timeDifference = moment
-          .duration(currentTime.diff(createdAt))
-          .asMinutes(); // Tính khoảng thời gian trong phút
-
-        return timeDifference <= q.time; // Lọc ra những yêu cầu trong vòng `time` phút
-      });
-      let responseAllCarts = [];
-      for (const cart of filteredCarts) {
-        const responseAllCart = await this.getCartOption(cart, false);
-        responseAllCarts.push(responseAllCart);
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
-    } else if (q.date !== undefined) {
-      const cartsByDate = await this.findObjectsByDate(q.date);
-      // if (cartsByDate === null || cartsByDate.length === 0) {
-      //   return 'No carts created on the specified date';
-      // }
-      let responseAllCarts = [];
-      for (const cart of cartsByDate) {
-        const responseAllCart = await this.getCartOption(cart, false);
-        responseAllCarts.push(responseAllCart);
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
-    } else {
-      let responseAllCarts = [];
-      for (const cart of allCarts) {
-        const responseAllCart = await this.getCartOption(cart, false);
-        responseAllCarts.push(responseAllCart);
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
-    }
-  }
-
-  async findAllCartsByCashier(cashierId: string, q?: any): Promise<any> {
-    const allCartsNoCashier =
+  async findAllCartsByGroup(groupId: string, q?: any): Promise<any> {
+    const allCartsNoGroupFilter =
       await this.cartRepository.findObjectWithoutLimit();
-    const allCarts = allCartsNoCashier.filter(
-      (cart) => cart.cashier_id === cashierId,
+    const allCarts = allCartsNoGroupFilter.filter(
+      (cart) => cart.group_id === groupId,
     );
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
@@ -262,10 +162,7 @@ export class CartService {
       responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
       return responseAllCarts;
     } else if (q.date !== undefined) {
-      const cartsByDate = await this.findObjectsByDateByCashier(
-        q.date,
-        cashierId,
-      );
+      const cartsByDate = await this.findObjectsByDateByGroup(q.date, groupId);
       // if (cartsByDate === null || cartsByDate.length === 0) {
       //   return 'No carts created on the specified date';
       // }
@@ -287,11 +184,11 @@ export class CartService {
     }
   }
 
-  async findHistoryCarts(cashierId: string, q?: any): Promise<any> {
-    const allCartsNoCashier =
+  async findHistoryCarts(groupId: string, q?: any): Promise<any> {
+    const allCartsNoGroupFilter =
       await this.cartRepository.findObjectWithoutLimit();
-    const allCarts = allCartsNoCashier.filter(
-      (cart) => cart.cashier_id === cashierId,
+    const allCarts = allCartsNoGroupFilter.filter(
+      (cart) => cart.group_id === groupId,
     );
     if (allCarts === null || allCarts.length === 0) {
       return 'No carts created';
@@ -319,23 +216,6 @@ export class CartService {
     responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
     return responseAllCarts;
   }
-
-  // async findAllCartsBackLog(limit?: number): Promise<any> {
-  //   const allCarts = await this.cartRepository.findObjectWithoutLimit();
-  //   let responeAllcartes = <any>[];
-  //   let filteredCarts = [];
-  //   for (const allCart of allCarts) {
-  //     if (allCart.status === 'IN_PROGRESS' || allCart.status === 'PENDING') {
-  //       filteredCarts.push(allCart);
-  //     }
-  //   }
-  //   const limitedCarts = limit ? filteredCarts.slice(0, limit) : filteredCarts;
-  //   for (const limitedCart of limitedCarts) {
-  //     const responeAllcart = await this.getCartOption(limitedCart, false);
-  //     responeAllcartes.push(responeAllcart);
-  //   }
-  //   return responeAllcartes;
-  // }
 
   async findCartById(_id: string): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });

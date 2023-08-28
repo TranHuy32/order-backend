@@ -26,7 +26,7 @@ export class Cart {
   @Prop({ required: true })
   total: number;
   @Prop({ default: null })
-  cashier_id: string;
+  group_id: string;
   @Prop({ required: true })
   table: string;
   @Prop({ default: null })

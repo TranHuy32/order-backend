@@ -5,11 +5,15 @@ import { TableRepository } from './repository/table.repository';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { EventsGateway } from 'src/events/events.gateway';
 import * as bcrypt from 'bcrypt';
+import { CashierService } from 'src/cashier/cashier.service';
+import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class TableService {
   constructor(
     private readonly tableRepository: TableRepository,
+    private readonly cashierService: CashierService,
+    private readonly groupService: GroupService,
     private readonly eventsGateway: EventsGateway,
   ) {}
 
@@ -25,53 +29,39 @@ export class TableService {
     cashierId: any,
   ): Promise<TableDocument> {
     const name = createTableDto.name;
+    const cashier = await this.cashierService.getByCashierId(cashierId);
     const existingTable = await this.findTableByNameForCreate(
       name,
-      createTableDto.cashier_id,
+      cashier.group_id,
     );
     if (existingTable) {
       throw new Error('This table already exists');
     }
+    const group = await this.groupService.findGroupById(cashier.group_id);
+    if (!group) {
+      throw new Error('Group not found');
+    }
+    createTableDto.group_id = cashier.group_id;
     const newTable = Object.assign(createTableDto);
     newTable.token = await this.hashToken(name);
-    // newTable.cashier_id = cashierId;
     newTable.createAt = new Date().toLocaleString('en-GB', {
       hour12: false,
     });
     return await this.tableRepository.createObject(newTable);
   }
 
-  async findAllTables(): Promise<any> {
+  async findAllTablesByCashier(groupId: any): Promise<any> {
     const tables = await this.tableRepository.findObjectWithoutLimit();
     if (tables === null || tables.length === 0) {
       throw new Error('No table created');
     }
-    return tables.map((table) => {
-      return {
-        _id: table._id,
-        name: table.name,
-        isActive: table.isActive,
-        token: table.token,
-      };
-    });
-  }
-
-  async findAllTablesByCashier(cashierId: any): Promise<any> {
-    const tables = await this.tableRepository.findObjectWithoutLimit();
-    if (tables === null || tables.length === 0) {
-      throw new Error('No table created');
-    }
-
-    const filteredTables = tables.filter(
-      (table) => table.cashier_id === cashierId,
-    );
-
+    const filteredTables = tables.filter((table) => table.group_id === groupId);
     return filteredTables.map((table) => {
       return {
         _id: table._id,
         name: table.name,
         isActive: table.isActive,
-        cashier_id: table.cashier_id,
+        group_id: table.group_id,
         token: table.token,
       };
     });
@@ -79,14 +69,14 @@ export class TableService {
 
   async findTableByNameForCreate(
     name: string,
-    cashierId: any,
+    group_id: any,
   ): Promise<TableDocument> {
     const tables = await this.tableRepository.findObjectWithoutLimit();
     if (tables === null || tables.length === 0) {
       return null;
     }
     const filteredTables = tables.filter(
-      (table) => table.cashier_id === cashierId,
+      (table) => table.group_id === group_id,
     );
     const existingTable = filteredTables.find((table) => table.name === name);
     if (!existingTable) {
@@ -95,14 +85,12 @@ export class TableService {
     return existingTable;
   }
 
-  async findTableByName(name: string, cashierId: any): Promise<TableDocument> {
+  async findTableByName(name: string, groupId: any): Promise<TableDocument> {
     const tables = await this.tableRepository.findObjectWithoutLimit();
     if (tables === null || tables.length === 0) {
       throw new Error('No table created');
     }
-    const filteredTables = tables.filter(
-      (table) => table.cashier_id === cashierId,
-    );
+    const filteredTables = tables.filter((table) => table.group_id === groupId);
     const existingTable = filteredTables.find((table) => table.name === name);
     if (!existingTable) {
       throw new Error('The table does not existed');

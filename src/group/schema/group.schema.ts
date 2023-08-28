@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type CategoryDocument = Category & Document;
+export type GroupDocument = Group & Document;
 
 @Schema()
-export class Category {
+export class Group {
   @Prop({ require: true })
   name: string;
   @Prop({ require: true })
-  group_id: string;
+  owner_id: string;
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category);
+export const GroupSchema = SchemaFactory.createForClass(Group);

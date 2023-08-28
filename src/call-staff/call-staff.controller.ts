@@ -20,49 +20,32 @@ export class CallStaffController {
   constructor(private readonly callStaffService: CallStaffService) {}
 
   // Tạo call staff
-  // @Post('create')
-  // async createCallStaff(
-  //   @Body() createCallStaffDto: CreateCallStaffDto,
-  // ): Promise<CallStaffDocument> {
-  //   return this.callStaffService.createCallStaff(createCallStaffDto);
-  // }
-
-  // Tạo call staff
-  @Post('create/:cashierId')
-  async createCallStaffByCashier(
+  @Post('create/:groupId')
+  async createCallStaffByGroup(
     @Body() createCallStaffDto: CreateCallStaffDto,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ): Promise<CallStaffDocument> {
-    return this.callStaffService.createCallStaffByCashier(
+    return this.callStaffService.createCallStaffByGroup(
       createCallStaffDto,
-      cashierId,
+      groupId,
     );
-  }
-
-  // all call staff
-  @Get('/all')
-  async allCallStaff(@Query() query: any) {
-    return this.callStaffService.findAllCallStaff(query.time);
   }
 
   // all call staff by Cashier
-  @Get('/all/:cashierId')
-  async allCallStaffByCashierId(
+  @Get('/all/:groupId')
+  async allCallStaffByGroupId(
     @Query() query: any,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ) {
-    return this.callStaffService.findAllCallStaffByCashier(
-      cashierId,
-      query.time,
-    );
+    return this.callStaffService.findAllCallStaffByGroup(groupId, query.time);
   }
 
-  @Get('/customer/:cashierId')
+  @Get('/customer/:groupId')
   async allCallStaffByCustomer(
     @Query() query: any,
-    @Param('cashierId') cashierId: string,
+    @Param('groupId') groupId: string,
   ) {
-    return this.callStaffService.findAllCallStaffCustomer(cashierId, query);
+    return this.callStaffService.findAllCallStaffCustomer(groupId, query);
   }
 
   @UseGuards(CashierAuthGuard)

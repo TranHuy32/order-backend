@@ -24,7 +24,7 @@ export class Dish {
   @Prop({ required: true })
   createAt: string;
   @Prop({ required: true })
-  cashier_id: string;
+  group_id: string;
   @Prop({ default: null })
   updateAt: string;
   @Prop()

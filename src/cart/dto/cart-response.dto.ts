@@ -7,7 +7,7 @@ export class CartResponse {
   total: number;
   createAt: string;
   status: string;
-  cashier_id: string;
+  group_id: string;
   table: string;
   customer_name: string;
   constructor(cart: any) {
@@ -17,7 +17,7 @@ export class CartResponse {
     this.total = cart.total;
     this.createAt = cart.createAt;
     this.status = cart.status;
-    this.cashier_id = cart.cashier_id;
+    this.group_id = cart.group_id;
     this.table = cart.table;
     this.customer_name = cart.customer_name;
   }

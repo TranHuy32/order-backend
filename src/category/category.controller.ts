@@ -12,9 +12,9 @@ export class CategoryController {
     return this.categoryService.findAllCatrgories();
   }
 
-  @Get('/allByCashier/:id')
-  async allCategoryByCashier(@Param('id') id: string) {
-    return this.categoryService.findAllCatrgoriesByCashier(id);
+  @Get('/allByCashier/:groupId')
+  async allCategoryByCashier(@Param('groupId') groupId: string) {
+    return this.categoryService.findAllCatrgoriesByCashier(groupId);
   }
 
   @UseGuards(CashierAuthGuard)

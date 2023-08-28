@@ -16,8 +16,6 @@ export class CashierService {
 
   // Kiem tra nguoi dung
   async validateCashier(cashierName: string, password: string) {
-    console.log(password);
-
     const cashier = await this.findByCashierName(cashierName);
     if (!cashier) return null;
     const doesPasswordMath = await bcrypt.compare(password, cashier.password);
@@ -30,6 +28,7 @@ export class CashierService {
     return {
       id: cashier._id,
       cashierName: cashier.cashierName,
+      role: cashier.role,
     };
   }
 
@@ -96,6 +95,8 @@ export class CashierService {
       id: cashier._id,
       name: cashier.name,
       cashierName: cashier.cashierName,
+      group_id: cashier.group_id,
+      role: cashier.role,
     };
   }
 
@@ -109,6 +110,8 @@ export class CashierService {
         id: cashier._id,
         name: cashier.name,
         cashierName: cashier.cashierName,
+        group_id: cashier.group_id,
+        role: cashier.role,
       };
     });
   }
