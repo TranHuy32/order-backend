@@ -42,7 +42,6 @@ export class CartController {
     return this.cartService.findAllCartsByGroup(groupId, query);
   }
 
-
   // History cart by group
   @Get('history/all/:groupId')
   async findCartByCustomer(
@@ -51,7 +50,6 @@ export class CartController {
   ): Promise<Cart[]> {
     return this.cartService.findHistoryCarts(groupId, query);
   }
-
 
   // Status cart
   @UseGuards(CashierAuthGuard)
@@ -62,6 +60,15 @@ export class CartController {
     @Req() req: any,
   ): Promise<CartResponse> {
     return this.cartService.setStatus(id, status);
+  }
+
+  @UseGuards(CashierAuthGuard)
+  @Put('/pay/:id')
+  async payCart(
+    @Param('id') id: string,
+    @Req() req: any,
+  ): Promise<CartResponse> {
+    return this.cartService.payCart(id);
   }
 
   // Update cart
