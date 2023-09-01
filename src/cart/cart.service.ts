@@ -126,24 +126,21 @@ export class CartService {
       .format('DD/MM/YYYY, HH:mm:ss');
     const endOfDay = moment(date, 'DD/MM/YYYY')
       .endOf('day')
-      .format('DD/MM/YYYY, HH:mm:ss');      
+      .format('DD/MM/YYYY, HH:mm:ss');
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
-    });    
-    console.log(cartByCreated);
-    console.log(groupId);
-    
+    });
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
-      return 'No carts created';
+      return [];
     }
     return result;
   }
 
-  async findAllCarts(cashier: any, q?: any): Promise<any> {    
+  async findAllCarts(cashier: any, q?: any): Promise<any> {
     const groups = await this.groupService.findAllGroupsByOwner(cashier.id);
-    
+
     let allCarts = [];
 
     for (const group of groups) {
@@ -174,21 +171,21 @@ export class CartService {
       }
       responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
       return responseAllCarts;
-      } else if (q.date !== undefined) {
-        let responseAllCarts = [];
-        for (const group of groups) {
-          const groupIdAsString = group._id.toString(); // Chuyển đổi ObjectId thành chuỗi
-          const cartsByDate = await this.findObjectsByDateByGroup(
-            q.date,
-            groupIdAsString,
-          );          
-          for (const cart of cartsByDate) {
-            const responseAllCart = await this.getCartOption(cart, false);
-            responseAllCarts.push(responseAllCart);
-          }
+    } else if (q.date !== undefined) {
+      let responseAllCarts = [];
+      for (const group of groups) {
+        const groupIdAsString = group._id.toString(); // Chuyển đổi ObjectId thành chuỗi
+        const cartsByDate = await this.findObjectsByDateByGroup(
+          q.date,
+          groupIdAsString,
+        );
+        for (const cart of cartsByDate) {
+          const responseAllCart = await this.getCartOption(cart, false);
+          responseAllCarts.push(responseAllCart);
         }
-        responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-        return responseAllCarts;
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
     } else {
       let responseAllCarts = [];
       for (const cart of allCarts) {
@@ -230,7 +227,7 @@ export class CartService {
       const cartsByDate = await this.findObjectsByDateByGroup(q.date, groupId);
       // if (cartsByDate === null || cartsByDate.length === 0) {
       //   return 'No carts created on the specified date';
-      // }      
+      // }
       let responseAllCarts = [];
       for (const cart of cartsByDate) {
         const responseAllCart = await this.getCartOption(cart, false);
