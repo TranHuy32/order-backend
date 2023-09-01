@@ -141,15 +141,14 @@ export class CartService {
   async findAllCarts(cashier: any, q?: any): Promise<any> {
     console.log(cashier);
     
-    const groupIds = await this.groupService.findAllGroupsByOwner(cashier.id);
-    console.log(groupIds);
+    const groups = await this.groupService.findAllGroupsByOwner(cashier.id);
     
     let allCarts = [];
 
-    for (const groupId of groupIds) {
+    for (const group of groups) {
       const cartsInGroup = await this.cartRepository.findObjectsBy(
         'group_id',
-        groupId,
+        group._id,
       );
       console.log(cartsInGroup);
       
