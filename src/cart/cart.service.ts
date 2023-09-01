@@ -130,9 +130,7 @@ export class CartService {
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
-    });
-    console.log(cartByCreated);
-    
+    });    
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
       return 'No carts created';
@@ -230,7 +228,7 @@ export class CartService {
       const cartsByDate = await this.findObjectsByDateByGroup(q.date, groupId);
       // if (cartsByDate === null || cartsByDate.length === 0) {
       //   return 'No carts created on the specified date';
-      // }
+      // }      
       let responseAllCarts = [];
       for (const cart of cartsByDate) {
         const responseAllCart = await this.getCartOption(cart, false);
