@@ -42,6 +42,13 @@ export class CartController {
     return this.cartService.findAllCartsByGroup(groupId, query);
   }
 
+  @UseGuards(CashierAuthGuard)
+  @Get('menu/all')
+  async findAllCarts(@Query() query, @Req() req: any): Promise<Cart[]> {
+    const cashier = req.user;
+    return this.cartService.findAllCarts(cashier, query);
+  }
+
   // History cart by group
   @Get('history/all/:groupId')
   async findCartByCustomer(

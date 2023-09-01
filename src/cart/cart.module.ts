@@ -8,6 +8,7 @@ import { CartService } from './cart.service';
 import { DishModule } from 'src/dish/dish.module';
 import { TableModule } from 'src/table/table.module';
 import { EventsModule } from 'src/events/events.module';
+import { GroupModule } from 'src/group/group.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EventsModule } from 'src/events/events.module';
     DishModule,
     TableModule,
     EventsModule,
+    GroupModule
   ],
   controllers: [CartController],
   providers: [CartService, CartRepository],
