@@ -126,16 +126,13 @@ export class CartService {
       .format('DD/MM/YYYY, HH:mm:ss');
     const endOfDay = moment(date, 'DD/MM/YYYY')
       .endOf('day')
-      .format('DD/MM/YYYY, HH:mm:ss');
-      console.log(startOfDay);
-      console.log(endOfDay);
-      
-      
+      .format('DD/MM/YYYY, HH:mm:ss');      
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
     });    
     console.log(cartByCreated);
+    console.log(groupId);
     
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
