@@ -48,7 +48,6 @@ export class CartService {
       createAt: cart.createAt,
       customer_name: cart.customer_name,
       group_id: cart.group_id,
-      isPaid: cart.isPaid,
     };
   }
 
@@ -294,21 +293,6 @@ export class CartService {
       cart.status = status;
       await cart.save();
       await this.eventsGateway.status(cart);
-      return cart;
-    }
-  }
-
-  async payCart(_id: string): Promise<any> {
-    const cart = await this.cartRepository.findOneObject({ _id });
-    if (!cart) {
-      return 'the cart has not been created yet';
-    } else {
-      if (cart.isPaid === true) {
-        return cart;
-      }
-      cart.isPaid = true;
-      await cart.save();
-      await this.eventsGateway.payCart(cart);
       return cart;
     }
   }
