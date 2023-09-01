@@ -127,10 +127,16 @@ export class CartService {
     const endOfDay = moment(date, 'DD/MM/YYYY')
       .endOf('day')
       .format('DD/MM/YYYY, HH:mm:ss');
+      console.log(startOfDay);
+      console.log(endOfDay);
+      
+      
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
     });    
+    console.log(cartByCreated);
+    
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
       return 'No carts created';
@@ -177,9 +183,7 @@ export class CartService {
         const cartsByDate = await this.findObjectsByDateByGroup(
           q.date,
           group._id,
-        );
-        console.log(cartsByDate);
-        
+        );          
         for (const cart of cartsByDate) {
           const responseAllCart = await this.getCartOption(cart, false);
           responseAllCarts.push(responseAllCart);
