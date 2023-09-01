@@ -141,7 +141,7 @@ export class CartService {
   async findAllCarts(cashier: any, q?: any): Promise<any> {
     console.log(cashier);
     
-    const groupIds = await this.groupService.findAllGroupsByOwner(cashier._id);
+    const groupIds = await this.groupService.findAllGroupsByOwner(cashier.id);
     console.log(groupIds);
     
     let allCarts = [];
