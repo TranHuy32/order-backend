@@ -177,10 +177,10 @@ export class CartService {
       return responseAllCarts;
     } else if (q.date !== undefined) {
       let responseAllCarts = [];
-      for (const groupId of groupIds) {
+      for (const group of groups) {
         const cartsByDate = await this.findObjectsByDateByGroup(
           q.date,
-          groupId,
+          group._id,
         );
         for (const cart of cartsByDate) {
           const responseAllCart = await this.getCartOption(cart, false);
