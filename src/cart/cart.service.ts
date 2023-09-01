@@ -131,6 +131,8 @@ export class CartService {
       $gte: startOfDay,
       $lte: endOfDay,
     });
+    console.log(cartByCreated);
+    
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
       return 'No carts created';
@@ -138,9 +140,7 @@ export class CartService {
     return result;
   }
 
-  async findAllCarts(cashier: any, q?: any): Promise<any> {
-    console.log(cashier);
-    
+  async findAllCarts(cashier: any, q?: any): Promise<any> {    
     const groups = await this.groupService.findAllGroupsByOwner(cashier.id);
     
     let allCarts = [];
@@ -150,8 +150,6 @@ export class CartService {
         'group_id',
         group._id,
       );
-      console.log(cartsInGroup);
-      
       allCarts = allCarts.concat(cartsInGroup);
     }
 
@@ -182,6 +180,8 @@ export class CartService {
           q.date,
           group._id,
         );
+        console.log(cartsByDate);
+        
         for (const cart of cartsByDate) {
           const responseAllCart = await this.getCartOption(cart, false);
           responseAllCarts.push(responseAllCart);
