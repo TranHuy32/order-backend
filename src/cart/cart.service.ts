@@ -174,20 +174,21 @@ export class CartService {
       }
       responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
       return responseAllCarts;
-    } else if (q.date !== undefined) {
-      let responseAllCarts = [];
-      for (const group of groups) {
-        const cartsByDate = await this.findObjectsByDateByGroup(
-          q.date,
-          group._id,
-        );          
-        for (const cart of cartsByDate) {
-          const responseAllCart = await this.getCartOption(cart, false);
-          responseAllCarts.push(responseAllCart);
+      } else if (q.date !== undefined) {
+        let responseAllCarts = [];
+        for (const group of groups) {
+          const groupIdAsString = group._id.toString(); // Chuyển đổi ObjectId thành chuỗi
+          const cartsByDate = await this.findObjectsByDateByGroup(
+            q.date,
+            groupIdAsString,
+          );          
+          for (const cart of cartsByDate) {
+            const responseAllCart = await this.getCartOption(cart, false);
+            responseAllCarts.push(responseAllCart);
+          }
         }
-      }
-      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
-      return responseAllCarts;
+        responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+        return responseAllCarts;
     } else {
       let responseAllCarts = [];
       for (const cart of allCarts) {
