@@ -8,6 +8,7 @@ import { TableService } from 'src/table/table.service';
 import { DishRepository } from 'src/dish/repository/dish.repository';
 import * as moment from 'moment';
 import { EventsGateway } from 'src/events/events.gateway';
+import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class CartService {
@@ -16,6 +17,7 @@ export class CartService {
     private readonly tableService: TableService,
     private readonly dishRepository: DishRepository,
     private readonly eventsGateway: EventsGateway,
+    private readonly groupService: GroupService,
   ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
@@ -46,6 +48,7 @@ export class CartService {
       createAt: cart.createAt,
       customer_name: cart.customer_name,
       group_id: cart.group_id,
+      isPaid: cart.isPaid,
     };
   }
 
@@ -127,12 +130,71 @@ export class CartService {
     const cartByCreated = await this.cartRepository.findObjectsBy('createAt', {
       $gte: startOfDay,
       $lte: endOfDay,
-    });    
+    });
     const result = cartByCreated.filter((cart) => cart.group_id === groupId);
     if (result === null || result.length === 0) {
-      return 'No carts created';
+      return [];
     }
     return result;
+  }
+
+  async findAllCarts(cashier: any, q?: any): Promise<any> {
+    const groups = await this.groupService.findAllGroupsByOwner(cashier.id);
+
+    let allCarts = [];
+
+    for (const group of groups) {
+      const cartsInGroup = await this.cartRepository.findObjectsBy(
+        'group_id',
+        group._id,
+      );
+      allCarts = allCarts.concat(cartsInGroup);
+    }
+
+    if (allCarts === null || allCarts.length === 0) {
+      return 'No carts created';
+    }
+    if (q.time !== undefined) {
+      const currentTime = moment(); // Lấy thời gian hiện tại
+      const filteredCarts = allCarts.filter((cart) => {
+        const createdAt = moment(cart.createAt, 'DD/MM/YYYY, HH:mm:ss'); // Chuyển đổi thời gian tạo yêu cầu thành đối tượng Moment và định dạng theo 'DD/MM/YYYY, HH:mm:ss'
+        const timeDifference = moment
+          .duration(currentTime.diff(createdAt))
+          .asMinutes(); // Tính khoảng thời gian trong phút
+
+        return timeDifference <= q.time; // Lọc ra những yêu cầu trong vòng `time` phút
+      });
+      let responseAllCarts = [];
+      for (const cart of filteredCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    } else if (q.date !== undefined) {
+      let responseAllCarts = [];
+      for (const group of groups) {
+        const groupIdAsString = group._id.toString(); // Chuyển đổi ObjectId thành chuỗi
+        const cartsByDate = await this.findObjectsByDateByGroup(
+          q.date,
+          groupIdAsString,
+        );
+        for (const cart of cartsByDate) {
+          const responseAllCart = await this.getCartOption(cart, false);
+          responseAllCarts.push(responseAllCart);
+        }
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    } else {
+      let responseAllCarts = [];
+      for (const cart of allCarts) {
+        const responseAllCart = await this.getCartOption(cart, false);
+        responseAllCarts.push(responseAllCart);
+      }
+      responseAllCarts.reverse(); // Đảo ngược thứ tự các giỏ hàng
+      return responseAllCarts;
+    }
   }
 
   async findAllCartsByGroup(groupId: string, q?: any): Promise<any> {
@@ -233,6 +295,21 @@ export class CartService {
       cart.status = status;
       await cart.save();
       await this.eventsGateway.status(cart);
+      return cart;
+    }
+  }
+
+  async payCart(_id: string): Promise<any> {
+    const cart = await this.cartRepository.findOneObject({ _id });
+    if (!cart) {
+      return 'the cart has not been created yet';
+    } else {
+      if (cart.isPaid === true) {
+        return cart;
+      }
+      cart.isPaid = true;
+      await cart.save();
+      await this.eventsGateway.payCart(cart);
       return cart;
     }
   }
