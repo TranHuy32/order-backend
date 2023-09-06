@@ -29,6 +29,7 @@ export class CashierService {
       id: cashier._id,
       cashierName: cashier.cashierName,
       role: cashier.role,
+      group_id: cashier.group_id,
     };
   }
 

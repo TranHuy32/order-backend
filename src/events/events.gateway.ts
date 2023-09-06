@@ -95,6 +95,12 @@ export class EventsGateway {
     return data;
   }
 
+  @SubscribeMessage('pay')
+  async payCart(@MessageBody() data: any): Promise<any> {
+    this.server.emit('payCart', data);
+    return data;
+  }
+
   @SubscribeMessage('login')
   async login(@MessageBody() data: any): Promise<any> {
     this.server.emit('anotherLogin', data);

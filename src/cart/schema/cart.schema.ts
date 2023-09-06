@@ -27,6 +27,8 @@ export class Cart {
   total: number;
   @Prop({ default: null })
   group_id: string;
+  @Prop({ default: false })
+  isPaid: boolean;
   @Prop({ required: true })
   table: string;
   @Prop({ default: null })

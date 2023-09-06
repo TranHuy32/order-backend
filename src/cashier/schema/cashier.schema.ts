@@ -6,7 +6,7 @@ export type CashierDocument = Cashier & Document;
 export enum Role {
   ADMIN = 'ADMIN',
   OWNER = 'OWNER',
-  MANAGE = 'MANAGE',
+  MANAGER = 'MANAGER',
   STAFF = 'STAFF',
 }
 
