@@ -9,6 +9,7 @@ export enum CartStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   CANCEL = 'CANCEL',
   COMPLETED = 'COMPLETED',
+  WAITPAY = 'WAITPAY',
 }
 
 @Schema()
@@ -21,18 +22,20 @@ export class Cart {
   createAt: string;
   @Prop({ default: null })
   updateAt: string;
-  @Prop({ enum: Object.values(CartStatus), default: CartStatus.IN_PROGRESS })
+  @Prop({ enum: Object.values(CartStatus), default: CartStatus.WAITPAY })
   status: CartStatus;
   @Prop({ required: true })
   total: number;
   @Prop({ default: null })
   group_id: string;
-  @Prop({ default: false })
-  isPaid: boolean;
+  // @Prop({ default: false })
+  // isPaid: boolean;
   @Prop({ required: true })
   table: string;
   @Prop({ default: null })
   customer_name: string;
+  @Prop({ default: null })
+  image_payment_id: string;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

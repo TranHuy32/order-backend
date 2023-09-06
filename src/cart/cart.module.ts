@@ -9,15 +9,36 @@ import { DishModule } from 'src/dish/dish.module';
 import { TableModule } from 'src/table/table.module';
 import { EventsModule } from 'src/events/events.module';
 import { GroupModule } from 'src/group/group.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { CallStaffModule } from 'src/call-staff/call-staff.module';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './uploads',
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+      limits: {
+        fileSize: 5 * 1024 * 1024, // Giới hạn dung lượng file 5MB
+      },
+    }),
     MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
     ImageModule,
     DishModule,
     TableModule,
     EventsModule,
-    GroupModule
+    GroupModule,
+    CallStaffModule,
   ],
   controllers: [CartController],
   providers: [CartService, CartRepository],

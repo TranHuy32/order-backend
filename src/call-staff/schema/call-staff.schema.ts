@@ -15,6 +15,8 @@ export class CallStaff {
   isChecked: boolean;
   @Prop({ required: true })
   createAt: string;
+  @Prop({ default: null })
+  totalBill: number;
 }
 
 export const CallStaffSchema = SchemaFactory.createForClass(CallStaff);

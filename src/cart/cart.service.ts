@@ -9,6 +9,10 @@ import { DishRepository } from 'src/dish/repository/dish.repository';
 import * as moment from 'moment';
 import { EventsGateway } from 'src/events/events.gateway';
 import { GroupService } from 'src/group/group.service';
+import { CreateImageDto } from 'src/image/dto/create-image.dto';
+import { ImageService } from 'src/image/image.service';
+import { ImageResponse } from 'src/image/dto/image-response.dto';
+import { CallStaffService } from 'src/call-staff/call-staff.service';
 
 @Injectable()
 export class CartService {
@@ -18,11 +22,24 @@ export class CartService {
     private readonly dishRepository: DishRepository,
     private readonly eventsGateway: EventsGateway,
     private readonly groupService: GroupService,
+    private readonly imageService: ImageService,
+    private readonly callStaffService: CallStaffService,
   ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
     if (isDetail) {
-      return new CartResponse(cart);
+      let imagePath = null;
+      if (cart.image_payment_id) {
+        const imagePath1: { [key: string]: ImageResponse } = {
+          image_detail: {
+            id: cart.image_payment_id,
+            path: (await this.imageService.findImageById(cart.image_payment_id))
+              .path,
+          },
+        };
+        imagePath = imagePath1;
+      }
+      return new CartResponse(cart, imagePath);
     }
     const orderItems = [];
     for (const orderItem of cart.order) {
@@ -48,7 +65,6 @@ export class CartService {
       createAt: cart.createAt,
       customer_name: cart.customer_name,
       group_id: cart.group_id,
-      isPaid: cart.isPaid,
     };
   }
 
@@ -299,18 +315,47 @@ export class CartService {
     }
   }
 
-  async payCart(_id: string): Promise<any> {
+  async payCartByStaff(_id: string, callStaffId): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
     if (!cart) {
       return 'the cart has not been created yet';
     } else {
-      if (cart.isPaid === true) {
+      await this.callStaffService.checkCallStaff(callStaffId);
+      if (cart.status === CartStatus.WAITPAY) {
+        cart.status = CartStatus.IN_PROGRESS;
+        await cart.save();
+        await this.eventsGateway.payCart(cart);
+        return cart;
+      } else {
         return cart;
       }
-      cart.isPaid = true;
-      await cart.save();
-      await this.eventsGateway.payCart(cart);
-      return cart;
+    }
+  }
+
+  async payByCustomer(
+    _id: string,
+    image_payment: Express.Multer.File,
+  ): Promise<any> {
+    const cart = await this.cartRepository.findOneObject({ _id });
+    if (!cart) {
+      return 'the cart has not been created yet';
+    } else {
+      if (cart.status === CartStatus.WAITPAY) {
+        const imageNew = new CreateImageDto();
+        const imagePaymentCreated = await this.imageService.createImage(
+          imageNew,
+          image_payment,
+        );
+        console.log(imagePaymentCreated);
+        
+        cart.image_payment_id = imagePaymentCreated.id;
+        cart.status = CartStatus.IN_PROGRESS;
+        await cart.save();
+        await this.eventsGateway.payCart(cart);
+        return cart;
+      } else {
+        return cart;
+      }
     }
   }
 

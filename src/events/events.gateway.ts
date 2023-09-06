@@ -106,4 +106,10 @@ export class EventsGateway {
     this.server.emit('anotherLogin', data);
     return data;
   }
+
+  @SubscribeMessage('createCallStaffForPay')
+  async createCallStaffForPay(@MessageBody() data: any): Promise<any> {
+    this.server.emit('newCallStaffForPay', data);
+    return data;
+  }
 }

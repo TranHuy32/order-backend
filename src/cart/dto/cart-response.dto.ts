@@ -1,3 +1,4 @@
+import { ImageResponse } from 'src/image/dto/image-response.dto';
 import { CreateDishOrderDto } from './create-dish-order.dto';
 
 export class CartResponse {
@@ -10,8 +11,8 @@ export class CartResponse {
   group_id: string;
   table: string;
   customer_name: string;
-  isPaid: boolean;
-  constructor(cart: any) {
+  image_payment: ImageResponse;
+  constructor(cart: any, imagePath: any) {
     this._id = cart._id;
     this.order = cart.order;
     this.note = cart.note;
@@ -21,6 +22,6 @@ export class CartResponse {
     this.group_id = cart.group_id;
     this.table = cart.table;
     this.customer_name = cart.customer_name;
-    this.isPaid = cart.isPaid;
+    this.image_payment = imagePath.image_detail;
   }
 }

@@ -8,6 +8,8 @@ import {
   Query,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
@@ -15,6 +17,7 @@ import { Cart, CartDocument, CartStatus } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('cart')
 export class CartController {
@@ -69,15 +72,6 @@ export class CartController {
     return this.cartService.setStatus(id, status);
   }
 
-  @UseGuards(CashierAuthGuard)
-  @Put('/pay/:id')
-  async payCart(
-    @Param('id') id: string,
-    @Req() req: any,
-  ): Promise<CartResponse> {
-    return this.cartService.payCart(id);
-  }
-
   // Update cart
   @UseGuards(CashierAuthGuard)
   @Put('update/:id')
@@ -86,5 +80,26 @@ export class CartController {
     @Body() updateCartDto: UpdateCartDto,
   ): Promise<CartDocument> {
     return this.cartService.updateCart(id, updateCartDto);
+  }
+
+  // @UseGuards(CashierAuthGuard)
+  @Put('/payByStaff/:id')
+  async payCart(
+    @Param('id') id: string,
+    @Body('callStaffId') callStaffId: string,
+  ): Promise<CartResponse> {
+    return this.cartService.payCartByStaff(id, callStaffId);
+  }
+
+  @Put('payByCustomer/:id')
+  @UseInterceptors(FileInterceptor('image_payment'))
+  async createDish(
+    @Param('id') id: string,
+    @UploadedFile()
+    image_payment: Express.Multer.File,
+  ): Promise<CartResponse> {
+    console.log(image_payment);
+    
+    return this.cartService.payByCustomer(id, image_payment);
   }
 }

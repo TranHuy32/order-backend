@@ -17,5 +17,6 @@ import { EventsModule } from 'src/events/events.module';
   ],
   controllers: [CallStaffController],
   providers: [CallStaffService, CallStaffRepository],
+  exports: [CallStaffService, CallStaffRepository],
 })
 export class CallStaffModule {}
