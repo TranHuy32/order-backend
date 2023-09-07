@@ -112,4 +112,10 @@ export class EventsGateway {
     this.server.emit('newCallStaffForPay', data);
     return data;
   }
+
+  @SubscribeMessage('selectCashMethod')
+  async selectCashMethod(@MessageBody() data: any): Promise<any> {
+    this.server.emit('newSelectCashMethod', data);
+    return data;
+  }
 }

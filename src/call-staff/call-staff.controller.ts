@@ -40,18 +40,6 @@ export class CallStaffController {
     return this.callStaffService.findAllCallStaffByGroup(groupId, query.time);
   }
 
-  // all call staff pay bill
-  @Get('/allPayBill/:groupId')
-  async allCallStaffPayBillByGroupId(
-    @Query() query: any,
-    @Param('groupId') groupId: string,
-  ) {
-    return this.callStaffService.findAllCallStaffPayBillByGroup(
-      groupId,
-      query.time,
-    );
-  }
-
   @Get('/customer/:groupId')
   async allCallStaffByCustomer(
     @Query() query: any,

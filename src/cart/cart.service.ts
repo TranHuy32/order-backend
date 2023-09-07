@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepository } from './repository/cart.repository';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { CartDocument, CartStatus } from './schema/cart.schema';
+import { CartDocument, CartStatus, PaymentMethod } from './schema/cart.schema';
 import { CartResponse } from './dto/cart-response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { TableService } from 'src/table/table.service';
@@ -65,6 +65,7 @@ export class CartService {
       createAt: cart.createAt,
       customer_name: cart.customer_name,
       group_id: cart.group_id,
+      paymentMethod: cart.paymentMethod,
     };
   }
 
@@ -315,19 +316,37 @@ export class CartService {
     }
   }
 
-  async payCartByStaff(_id: string, callStaffId): Promise<any> {
+  async payCartByStaff(_id: string): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
     if (!cart) {
-      return 'the cart has not been created yet';
+      return false;
     } else {
-      await this.callStaffService.checkCallStaff(callStaffId);
-      if (cart.status === CartStatus.WAITPAY) {
+      if (
+        cart.status === CartStatus.WAITPAY &&
+        cart.paymentMethod === PaymentMethod.CASH
+      ) {
         cart.status = CartStatus.IN_PROGRESS;
         await cart.save();
         await this.eventsGateway.payCart(cart);
-        return cart;
+        return true;
       } else {
-        return cart;
+        return false;
+      }
+    }
+  }
+
+  async selectCashMethod(_id: string): Promise<any> {
+    const cart = await this.cartRepository.findOneObject({ _id });
+    if (!cart) {
+      return false;
+    } else {
+      if (cart.status === CartStatus.WAITPAY) {
+        cart.paymentMethod = PaymentMethod.CASH;
+        await cart.save();
+        await this.eventsGateway.selectCashMethod(cart);
+        return true;
+      } else {
+        return false;
       }
     }
   }
@@ -338,7 +357,7 @@ export class CartService {
   ): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
     if (!cart) {
-      return 'the cart has not been created yet';
+      return false;
     } else {
       if (cart.status === CartStatus.WAITPAY) {
         const imageNew = new CreateImageDto();
@@ -346,15 +365,14 @@ export class CartService {
           imageNew,
           image_payment,
         );
-        console.log(imagePaymentCreated);
-        
         cart.image_payment_id = imagePaymentCreated.id;
+        cart.paymentMethod = PaymentMethod.BANK;
         cart.status = CartStatus.IN_PROGRESS;
         await cart.save();
         await this.eventsGateway.payCart(cart);
-        return cart;
+        return true;
       } else {
-        return cart;
+        return false;
       }
     }
   }

@@ -84,22 +84,22 @@ export class CartController {
 
   // @UseGuards(CashierAuthGuard)
   @Put('/payByStaff/:id')
-  async payCart(
-    @Param('id') id: string,
-    @Body('callStaffId') callStaffId: string,
-  ): Promise<CartResponse> {
-    return this.cartService.payCartByStaff(id, callStaffId);
+  async payCartByStaff(@Param('id') id: string): Promise<boolean> {
+    return this.cartService.payCartByStaff(id);
   }
 
   @Put('payByCustomer/:id')
   @UseInterceptors(FileInterceptor('image_payment'))
-  async createDish(
+  async payCartByCustomer(
     @Param('id') id: string,
     @UploadedFile()
     image_payment: Express.Multer.File,
-  ): Promise<CartResponse> {
-    console.log(image_payment);
-    
+  ): Promise<boolean> {
     return this.cartService.payByCustomer(id, image_payment);
+  }
+
+  @Put('/selectCashMethod/:id')
+  async selectCashMethod(@Param('id') id: string): Promise<boolean> {
+    return this.cartService.selectCashMethod(id);
   }
 }

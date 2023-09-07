@@ -11,7 +11,11 @@ export enum CartStatus {
   COMPLETED = 'COMPLETED',
   WAITPAY = 'WAITPAY',
 }
-
+export enum PaymentMethod {
+  NULL = 'NULL',
+  CASH = 'CASH',
+  BANK = 'BANK',
+}
 @Schema()
 export class Cart {
   @Prop({ required: true })
@@ -24,12 +28,12 @@ export class Cart {
   updateAt: string;
   @Prop({ enum: Object.values(CartStatus), default: CartStatus.WAITPAY })
   status: CartStatus;
+  @Prop({ enum: Object.values(PaymentMethod), default: PaymentMethod.NULL })
+  paymentMethod: PaymentMethod;
   @Prop({ required: true })
   total: number;
   @Prop({ default: null })
   group_id: string;
-  // @Prop({ default: false })
-  // isPaid: boolean;
   @Prop({ required: true })
   table: string;
   @Prop({ default: null })
