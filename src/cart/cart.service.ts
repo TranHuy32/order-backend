@@ -55,6 +55,17 @@ export class CartService {
         });
       }
     }
+    let imagePath = null;
+    if (cart.image_payment_id) {
+      const imagePath1: { [key: string]: ImageResponse } = {
+        image_detail: {
+          id: cart.image_payment_id,
+          path: (await this.imageService.findImageById(cart.image_payment_id))
+            .path,
+        },
+      };
+      imagePath = imagePath1;
+    }
     return {
       _id: cart._id,
       order: orderItems,
@@ -66,6 +77,7 @@ export class CartService {
       customer_name: cart.customer_name,
       group_id: cart.group_id,
       paymentMethod: cart.paymentMethod,
+      image_payment: imagePath.image_detail,
     };
   }
 
