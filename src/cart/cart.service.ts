@@ -77,7 +77,7 @@ export class CartService {
       customer_name: cart.customer_name,
       group_id: cart.group_id,
       paymentMethod: cart.paymentMethod,
-      image_payment: imagePath.image_detail,
+      image_payment: imagePath?.image_detail,
     };
   }
 

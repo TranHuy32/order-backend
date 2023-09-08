@@ -24,7 +24,7 @@ export class CartResponse {
     this.group_id = cart.group_id;
     this.table = cart.table;
     this.customer_name = cart.customer_name;
-    this.image_payment = imagePath.image_detail;
+    this.image_payment = imagePath?.image_detail;
     this.paymentMethod = cart.paymentMethod;
   }
 }
