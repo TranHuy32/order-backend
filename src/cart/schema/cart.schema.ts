@@ -40,6 +40,8 @@ export class Cart {
   customer_name: string;
   @Prop({ default: null })
   image_payment_id: string;
+  @Prop({ default: null })
+  paymentStaff: string;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

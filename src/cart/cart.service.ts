@@ -13,6 +13,8 @@ import { CreateImageDto } from 'src/image/dto/create-image.dto';
 import { ImageService } from 'src/image/image.service';
 import { ImageResponse } from 'src/image/dto/image-response.dto';
 import { CallStaffService } from 'src/call-staff/call-staff.service';
+import { CashierService } from 'src/cashier/cashier.service';
+import { CashierRepository } from 'src/cashier/repository/cashier.repository';
 
 @Injectable()
 export class CartService {
@@ -24,22 +26,26 @@ export class CartService {
     private readonly groupService: GroupService,
     private readonly imageService: ImageService,
     private readonly callStaffService: CallStaffService,
+    private readonly cashierRepository: CashierRepository,
   ) {}
 
   async getCartOption(cart: CartDocument, isDetail: boolean): Promise<any> {
+    const staff = await this.cashierRepository.findOneObject({
+      _id: cart.paymentStaff,
+    });
+    let imagePath = null;
+    if (cart.image_payment_id) {
+      const imagePath1: { [key: string]: ImageResponse } = {
+        image_detail: {
+          id: cart.image_payment_id,
+          path: (await this.imageService.findImageById(cart.image_payment_id))
+            .path,
+        },
+      };
+      imagePath = imagePath1;
+    }
     if (isDetail) {
-      let imagePath = null;
-      if (cart.image_payment_id) {
-        const imagePath1: { [key: string]: ImageResponse } = {
-          image_detail: {
-            id: cart.image_payment_id,
-            path: (await this.imageService.findImageById(cart.image_payment_id))
-              .path,
-          },
-        };
-        imagePath = imagePath1;
-      }
-      return new CartResponse(cart, imagePath);
+      return new CartResponse(cart, imagePath, staff);
     }
     const orderItems = [];
     for (const orderItem of cart.order) {
@@ -55,17 +61,6 @@ export class CartService {
         });
       }
     }
-    let imagePath = null;
-    if (cart.image_payment_id) {
-      const imagePath1: { [key: string]: ImageResponse } = {
-        image_detail: {
-          id: cart.image_payment_id,
-          path: (await this.imageService.findImageById(cart.image_payment_id))
-            .path,
-        },
-      };
-      imagePath = imagePath1;
-    }
     return {
       _id: cart._id,
       order: orderItems,
@@ -78,6 +73,7 @@ export class CartService {
       group_id: cart.group_id,
       paymentMethod: cart.paymentMethod,
       image_payment: imagePath?.image_detail,
+      paymentStaff: staff?.name,
     };
   }
 
@@ -328,8 +324,10 @@ export class CartService {
     }
   }
 
-  async payCartByStaff(_id: string): Promise<any> {
+  async payCartByStaff(_id: string, staff: any): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
+    console.log(staff);
+    
     if (!cart) {
       return false;
     } else {
@@ -338,8 +336,11 @@ export class CartService {
         cart.paymentMethod === PaymentMethod.CASH
       ) {
         cart.status = CartStatus.IN_PROGRESS;
+        cart.paymentStaff = staff.id;
         await cart.save();
         await this.eventsGateway.payCart(cart);
+        console.log(cart);
+        
         return true;
       } else {
         return false;

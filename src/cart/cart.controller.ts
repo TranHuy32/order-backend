@@ -82,10 +82,14 @@ export class CartController {
     return this.cartService.updateCart(id, updateCartDto);
   }
 
-  // @UseGuards(CashierAuthGuard)
+  @UseGuards(CashierAuthGuard)
   @Put('/payByStaff/:id')
-  async payCartByStaff(@Param('id') id: string): Promise<boolean> {
-    return this.cartService.payCartByStaff(id);
+  async payCartByStaff(
+    @Param('id') id: string,
+    @Req() req: any,
+  ): Promise<boolean> {
+    const staff = req.user;
+    return this.cartService.payCartByStaff(id, staff);
   }
 
   @Put('payByCustomer/:id')

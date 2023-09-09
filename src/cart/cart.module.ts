@@ -13,6 +13,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { CallStaffModule } from 'src/call-staff/call-staff.module';
+import { CashierModule } from 'src/cashier/cashier.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CallStaffModule } from 'src/call-staff/call-staff.module';
     EventsModule,
     GroupModule,
     CallStaffModule,
+    CashierModule
   ],
   controllers: [CartController],
   providers: [CartService, CartRepository],
