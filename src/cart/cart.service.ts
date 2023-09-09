@@ -324,10 +324,8 @@ export class CartService {
     }
   }
 
-  async payCartByStaff(_id: string, staff: any): Promise<any> {
+  async payCartByStaff(_id: string, staffId: any): Promise<any> {
     const cart = await this.cartRepository.findOneObject({ _id });
-    console.log(staff);
-    
     if (!cart) {
       return false;
     } else {
@@ -336,11 +334,9 @@ export class CartService {
         cart.paymentMethod === PaymentMethod.CASH
       ) {
         cart.status = CartStatus.IN_PROGRESS;
-        cart.paymentStaff = staff.id;
+        cart.paymentStaff = staffId;
         await cart.save();
         await this.eventsGateway.payCart(cart);
-        console.log(cart);
-        
         return true;
       } else {
         return false;
