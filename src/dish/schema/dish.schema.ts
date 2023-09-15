@@ -27,8 +27,8 @@ export class Dish {
   group_id: string;
   @Prop({ default: null })
   updateAt: string;
-  @Prop()
-  options: string[];
+  @Prop([{ name: String, price: { type: Number, default: 0 } }])
+  options: { name: string; price: number }[];
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

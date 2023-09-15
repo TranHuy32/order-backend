@@ -21,6 +21,7 @@ import { Dish, DishDocument } from './schema/dish.schema';
 import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { CashierAuthGuard } from 'src/auth/cashier-auth/guards/auth.guard';
+import { CreateOptionDto } from './dto/create-option.dto';
 
 @Controller('dish')
 export class DishController {
@@ -144,8 +145,8 @@ export class DishController {
   @Post('add-option/:id')
   async addOption(
     @Param('id') id: string,
-    @Body('option') option: string[],
-  ): Promise<DishDocument> {
+    @Body('option') option: CreateOptionDto,
+  ): Promise<DishDocument> {    
     return this.dishService.addOption(id, option);
   }
 
@@ -156,6 +157,6 @@ export class DishController {
     @Param('id') id: string,
     @Query() q: any,
   ): Promise<DishDocument> {
-    return this.dishService.deleteOption(id, q.option);
+    return this.dishService.deleteOption(id, q.name);
   }
 }

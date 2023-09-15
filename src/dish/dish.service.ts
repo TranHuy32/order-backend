@@ -11,6 +11,7 @@ import { DishResponse } from './dto/dish-response.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { EventsGateway } from 'src/events/events.gateway';
 import { CashierService } from 'src/cashier/cashier.service';
+import { CreateOptionDto } from './dto/create-option.dto';
 @Injectable()
 export class DishService {
   constructor(
@@ -146,14 +147,9 @@ export class DishService {
     return responeAllDishes;
   }
 
-  async findBestSellerByCashier(
-    groupId: string,
-    limit?: number,
-  ): Promise<any> {
+  async findBestSellerByCashier(groupId: string, limit?: number): Promise<any> {
     const dishes = await this.dishRepository.findObjectWithoutLimit(); // xử lý limit ở dưới\
-    const filteredDishes = dishes.filter(
-      (dish) => dish.group_id === groupId,
-    );
+    const filteredDishes = dishes.filter((dish) => dish.group_id === groupId);
     let responeAllDishes = <any>[];
     const filterActiveDishes = filteredDishes.filter(
       (allDishes) => allDishes.isActive === true,
@@ -259,33 +255,34 @@ export class DishService {
     return await this.getDishOption(dish, true);
   }
 
-  async addOption(_id: string, options: string[]): Promise<any> {
+  async addOption(_id: string, options: CreateOptionDto): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
       return 'The dish has not been created yet';
     } else {
       if (Array.isArray(dish.options)) {
-        for (const option of options) {
-          if (!dish.options.includes(option)) {
-            dish.options.push(option);
-          }
+        const existingOption = dish.options.find(
+          (opt) => opt.name === options.name,
+        );
+        if (!existingOption) {
+          dish.options.push(options);
         }
       } else {
-        dish.options = options;
+        dish.options = [options];
       }
       await dish.save();
       return dish;
     }
   }
 
-  async deleteOption(_id: string, optionToDelete: string): Promise<any> {
+  async deleteOption(_id: string, nameToDelete: string): Promise<any> {
     const dish = await this.dishRepository.findOneObject({ _id });
     if (!dish) {
       return 'The dish has not been created yet';
     } else {
       if (Array.isArray(dish.options)) {
         dish.options = dish.options.filter(
-          (option) => option !== optionToDelete,
+          (option) => option.name !== nameToDelete,
         );
       }
       await dish.save();
